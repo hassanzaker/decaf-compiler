@@ -8,6 +8,7 @@ class Cgen(Transformer):
     def __init__(self):
         self.data_code = ''
         self.string_numbers = 0
+        self.label_number = 0
 
     def log_code(self, code):
         dirname = os.path.dirname(__file__)
@@ -42,7 +43,7 @@ class Cgen(Transformer):
     def exp_minus_exp(self, args):
         value_type1 = args[0]['value_type']
         value_type2 = args[1]['value_type']
-        code = "# Add Expression\n"
+        code = "# minus Expression\n"
         if value_type1 == 'int' and value_type2 == value_type1:
             code += "lw $t0 , 8($sp)\n"
             code += "lw $t1 , 4($sp)\n"
@@ -62,7 +63,7 @@ class Cgen(Transformer):
     def exp_mul_exp(self, args):
         value_type1 = args[0]['value_type']
         value_type2 = args[1]['value_type']
-        code = "# Add Expression\n"
+        code = "# div Expression\n"
         if value_type1 == 'int' and value_type2 == value_type1:
             code += "lw $t0 , 8($sp)\n"
             code += "lw $t1 , 4($sp)\n"
@@ -82,7 +83,7 @@ class Cgen(Transformer):
     def exp_div_exp(self, args):
         value_type1 = args[0]['value_type']
         value_type2 = args[1]['value_type']
-        code = "# Add Expression\n"
+        code = "# div Expression\n"
         if value_type1 == 'int' and value_type2 == value_type1:
             code += "lw $t0 , 8($sp)\n"
             code += "lw $t1 , 4($sp)\n"
@@ -102,7 +103,7 @@ class Cgen(Transformer):
     def exp_mod_exp(self, args):
         value_type1 = args[0]['value_type']
         value_type2 = args[1]['value_type']
-        code = "# Add Expression\n"
+        code = "# mod Expression\n"
         if value_type1 == 'int' and value_type2 == value_type1:
             code += "lw $t0 , 8($sp)\n"
             code += "lw $t1 , 4($sp)\n"
@@ -131,7 +132,256 @@ class Cgen(Transformer):
         return {'code': args[0]['code'] + code,
                 'value_type': value_type}
 
+    ############ compare ################
+    def exp_less_exp(self, args):
+        value_type1 = args[0]['value_type']
+        value_type2 = args[1]['value_type']
+        code = "# less than Expression\n"
+        if value_type1 == 'int' and value_type2 == value_type1:
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "slt $t0 , $t0 , $t1\n"
+            code += "sw $t0 , 8($sp)\n"
+        elif value_type1 == 'double' and value_type2 == value_type1:
+            first_label = "label" + str(self.string_numbers)
+            self.string_numbers += 1
+            second_label = "label" + str(self.string_numbers)
+            self.string_numbers += 1
+            code += "l.s $f0 , 8($sp)\n"
+            code += "l.s $f1 , 4($sp)\n"
+            code += "c.lt.s $f0 , $f1\n"
+            code += "bc1t " + first_label + " # if first is less than second\n"
+            code += "li $t0 , 0\n"
+            code += "j " + second_label + "\n"
+            code += first_label + ":\n"
+            code += "li $t0 , 1\n"
+            code += second_label + ":\n"
+            code += "sw $t0 , 8($sp)\n"
+        else:
+            raise Exception("Can Not compare " + value_type1 + " with " + value_type2 + "!")
+        code += "addi $sp , $sp , 4\n"
+        return {'code': args[0]['code'] + args[1]['code'] + code,
+                'value_type': 'bool'}
+
+    def exp_less_equal_exp(self, args):
+        value_type1 = args[0]['value_type']
+        value_type2 = args[1]['value_type']
+        code = "# less equal than Expression\n"
+        if value_type1 == 'int' and value_type2 == value_type1:
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "sle $t0 , $t0 , $t1\n"
+            code += "sw $t0 , 8($sp)\n"
+        elif value_type1 == 'double' and value_type2 == value_type1:
+            first_label = "label" + str(self.string_numbers)
+            self.string_numbers += 1
+            second_label = "label" + str(self.string_numbers)
+            self.string_numbers += 1
+            code += "l.s $f0 , 8($sp)\n"
+            code += "l.s $f1 , 4($sp)\n"
+            code += "c.le.s $f0 , $f1\n"
+            code += "bc1t " + first_label + "\n"
+            code += "li $t0 , 0\n"
+            code += "j " + second_label + "\n"
+            code += first_label + ":\n"
+            code += "li $t0 , 1\n"
+            code += second_label + ":\n"
+            code += "sw $t0 , 8($sp)\n"
+        else:
+            raise Exception("Can Not compare " + value_type1 + " with " + value_type2 + "!")
+        code += "addi $sp , $sp , 4\n"
+        return {'code': args[0]['code'] + args[1]['code'] + code,
+                'value_type': 'bool'}
+
+    def exp_greater_exp(self, args):
+        value_type1 = args[0]['value_type']
+        value_type2 = args[1]['value_type']
+        code = "# greater than Expression\n"
+        if value_type1 == 'int' and value_type2 == value_type1:
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "sgt $t0 , $t0 , $t1\n"
+            code += "sw $t0 , 8($sp)\n"
+        elif value_type1 == 'double' and value_type2 == value_type1:
+            first_label = "label" + str(self.string_numbers)
+            self.string_numbers += 1
+            second_label = "label" + str(self.string_numbers)
+            self.string_numbers += 1
+            code += "l.s $f0 , 8($sp)\n"
+            code += "l.s $f1 , 4($sp)\n"
+            code += "c.lt.s $f1 , $f0\n"
+            code += "bc1t " + first_label + "\n"
+            code += "li $t0 , 0\n"
+            code += "j " + second_label + "\n"
+            code += first_label + ":\n"
+            code += "li $t0 , 1\n"
+            code += second_label + ":\n"
+            code += "sw $t0 , 8($sp)\n"
+        else:
+            raise Exception("Can Not compare " + value_type1 + " with " + value_type2 + "!")
+        code += "addi $sp , $sp , 4\n"
+        return {'code': args[0]['code'] + args[1]['code'] + code,
+                'value_type': 'bool'}
+
+
+    def exp_greater_equal_exp(self, args):
+        value_type1 = args[0]['value_type']
+        value_type2 = args[1]['value_type']
+        code = "# greater equal than Expression\n"
+        if value_type1 == 'int' and value_type2 == value_type1:
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "sge $t0 , $t0 , $t1\n"
+            code += "sw $t0 , 8($sp)\n"
+        elif value_type1 == 'double' and value_type2 == value_type1:
+            first_label = "label" + str(self.string_numbers)
+            self.string_numbers += 1
+            second_label = "label" + str(self.string_numbers)
+            self.string_numbers += 1
+            code += "l.s $f0 , 8($sp)\n"
+            code += "l.s $f1 , 4($sp)\n"
+            code += "c.le.s $f1 , $f0\n"
+            code += "bc1t " + first_label + "\n"
+            code += "li $t0 , 0\n"
+            code += "j " + second_label + "\n"
+            code += first_label + ":\n"
+            code += "li $t0 , 1\n"
+            code += second_label + ":\n"
+            code += "sw $t0 , 8($sp)\n"
+        else:
+            raise Exception("Can Not compare " + value_type1 + " with " + value_type2 + "!")
+        code += "addi $sp , $sp , 4\n"
+        return {'code': args[0]['code'] + args[1]['code'] + code,
+                'value_type': 'bool'}
+
+    def exp_equal_exp(self, args):
+        value_type1 = args[0]['value_type']
+        value_type2 = args[1]['value_type']
+        first_label = "label" + str(self.string_numbers)
+        self.string_numbers += 1
+        second_label = "label" + str(self.string_numbers)
+        self.string_numbers += 1
+        code = "#  equality of Expressions\n"
+        if (value_type1 == 'int' or value_type1 == 'bool') and value_type2 == value_type1:
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "beq $t0 , $t1 , " + first_label + "\n"
+            code += "li $t0, 0\n"
+            code += "j " + second_label + "\n"
+            code += first_label + " :\n"
+            code += "li $t0 , 1\n"
+            code += second_label + " :\n"
+            code += "sw $t0 , 8($sp)\n"
+        elif value_type1 == 'double' and value_type2 == value_type1:
+            code += "l.s $f0 , 8($sp)\n"
+            code += "l.s $f1 , 4($sp)\n"
+            code += "c.eq.s $f1 , $f0\n"
+            code += "bc1t " + first_label + "\n"
+            code += "li $t0 , 0\n"
+            code += "j " + second_label + "\n"
+            code += first_label + ":\n"
+            code += "li $t0 , 1\n"
+            code += second_label + ":\n"
+            code += "sw $t0 , 8($sp)\n"
+        else:
+            raise Exception("Can Not compare " + value_type1 + " with " + value_type2 + "!")
+        code += "addi $sp , $sp , 4\n"
+        return {'code': args[0]['code'] + args[1]['code'] + code,
+                'value_type': 'bool'}
+
+
+    def exp_not_equal_exp(self, args):
+        value_type1 = args[0]['value_type']
+        value_type2 = args[1]['value_type']
+        first_label = "label" + str(self.string_numbers)
+        self.string_numbers += 1
+        second_label = "label" + str(self.string_numbers)
+        self.string_numbers += 1
+        code = "#   inequality of Expressions\n"
+        if (value_type1 == 'int' or value_type1 == 'bool') and value_type2 == value_type1:
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "bne $t0 , $t1 , " + first_label + "\n"
+            code += "li $t0, 0\n"
+            code += "j " + second_label + "\n"
+            code += first_label + " :\n"
+            code += "li $t0 , 1\n"
+            code += second_label + " :\n"
+            code += "sw $t0 , 8($sp)\n"
+        elif value_type1 == 'double' and value_type2 == value_type1:
+            code += "l.s $f0 , 8($sp)\n"
+            code += "l.s $f1 , 4($sp)\n"
+            code += "c.eq.s $f1 , $f0\n"
+            code += "bc1t " + first_label + "\n"
+            code += "li $t0 , 1\n"
+            code += "j " + second_label + "\n"
+            code += first_label + ":\n"
+            code += "li $t0 , 0\n"
+            code += second_label + ":\n"
+            code += "sw $t0 , 8($sp)\n"
+        else:
+            raise Exception("Can Not compare " + value_type1 + " with " + value_type2 + "!")
+        code += "addi $sp , $sp , 4\n"
+        return {'code': args[0]['code'] + args[1]['code'] + code,
+                'value_type': 'bool'}
+
+
+    ########################## Logical ####################33
+    def exp_and_exp(self, args):
+        value_type1 = args[0]['value_type']
+        value_type2 = args[1]['value_type']
+        code = "# And Expression\n"
+        if value_type1 == 'bool' and value_type2 == value_type1:
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "and $t0 , $t0 , $t1\n"
+            code += "sw $t0 , 8($sp)\n"
+        else:
+            raise Exception(value_type1 + " and " + value_type2 + " should be bool!")
+        code += "addi $sp , $sp , 4\n"
+        return {'code': args[0]['code'] + args[1]['code'] + code,
+                'value_type': value_type1}
+
+    def exp_or_exp(self, args):
+        value_type1 = args[0]['value_type']
+        value_type2 = args[1]['value_type']
+        code = "# And Expression\n"
+        if value_type1 == 'bool' and value_type2 == value_type1:
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "or $t0 , $t0 , $t1\n"
+            code += "sw $t0 , 8($sp)\n"
+        else:
+            raise Exception(value_type1 + " and " + value_type2 + " should be bool!")
+        code += "addi $sp , $sp , 4\n"
+        return {'code': args[0]['code'] + args[1]['code'] + code,
+                'value_type': value_type1}
+
+    def exp_not(self, args):
+        first_label = "label" + str(self.string_numbers)
+        self.string_numbers += 1
+        second_label = "label" + str(self.string_numbers)
+        self.string_numbers += 1
+        value_type = args[0]['value_type']
+        code = '# Negative an expression\n'
+        if value_type == 'bool':
+            code += "lw $t0 , 4($sp)\n"
+            code += "beq $t0 , $zero , " + first_label + "\n"
+            code += "li $t0, 0\n"
+            code += "j " + second_label + "\n"
+            code += first_label + ": \n"
+            code += "li $t0 , 1\n"
+            code += second_label + ": \n"
+            code += "sw $t0 , 4($sp)\n"
+        else:
+            raise Exception(value_type + " should be bool !")
+        return {'code': args[0]['code'] + code,
+                'value_type': value_type}
 #######################################
+
+    def exp_inside_parenthesis(self, args):
+        return args[0];
+
 
 
 ####################### Type  ###########################

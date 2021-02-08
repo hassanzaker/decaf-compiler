@@ -172,31 +172,233 @@ addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5
 # Begin of Statement Block
 addi $sp , $sp , -0 # Allocate From Stack For Block Statement Variables
 addi $fp , $sp , 4
-# Int Constant : 33
-li $t0 , 33
+# Bool Constant : false
+li $t0, 0
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# Bool Constant : false
+li $t0, 0
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# And Expression
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+and $t0 , $t0 , $t1
+sw $t0 , 8($sp)
+addi $sp , $sp , 4
+# Print expr : 
+addi $sp , $sp , 4 # Pop Expression of Print
+lw $a0 , 0($sp)
+la $t0 , str_bool
+sll $a0 , $a0 , 2
+add $a0 , $a0 , $t0
+lw $a0 , 0($a0)
+li $v0 , 4
+syscall
+# Bool Constant : false
+li $t0, 0
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# Bool Constant : true
+li $t0 , 1
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# And Expression
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+and $t0 , $t0 , $t1
+sw $t0 , 8($sp)
+addi $sp , $sp , 4
+# Print expr : 
+addi $sp , $sp , 4 # Pop Expression of Print
+lw $a0 , 0($sp)
+la $t0 , str_bool
+sll $a0 , $a0 , 2
+add $a0 , $a0 , $t0
+lw $a0 , 0($a0)
+li $v0 , 4
+syscall
+# Bool Constant : true
+li $t0 , 1
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# Bool Constant : false
+li $t0, 0
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# And Expression
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+and $t0 , $t0 , $t1
+sw $t0 , 8($sp)
+addi $sp , $sp , 4
+# Print expr : 
+addi $sp , $sp , 4 # Pop Expression of Print
+lw $a0 , 0($sp)
+la $t0 , str_bool
+sll $a0 , $a0 , 2
+add $a0 , $a0 , $t0
+lw $a0 , 0($a0)
+li $v0 , 4
+syscall
+# Bool Constant : true
+li $t0 , 1
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# Bool Constant : true
+li $t0 , 1
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# And Expression
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+and $t0 , $t0 , $t1
+sw $t0 , 8($sp)
+addi $sp , $sp , 4
+# Print expr : 
+addi $sp , $sp , 4 # Pop Expression of Print
+lw $a0 , 0($sp)
+la $t0 , str_bool
+sll $a0 , $a0 , 2
+add $a0 , $a0 , $t0
+lw $a0 , 0($a0)
+li $v0 , 4
+syscall
+# Bool Constant : false
+li $t0, 0
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# Bool Constant : false
+li $t0, 0
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# And Expression
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+or $t0 , $t0 , $t1
+sw $t0 , 8($sp)
+addi $sp , $sp , 4
+# Print expr : 
+addi $sp , $sp , 4 # Pop Expression of Print
+lw $a0 , 0($sp)
+la $t0 , str_bool
+sll $a0 , $a0 , 2
+add $a0 , $a0 , $t0
+lw $a0 , 0($a0)
+li $v0 , 4
+syscall
+# Bool Constant : false
+li $t0, 0
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# Bool Constant : true
+li $t0 , 1
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# And Expression
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+or $t0 , $t0 , $t1
+sw $t0 , 8($sp)
+addi $sp , $sp , 4
+# Print expr : 
+addi $sp , $sp , 4 # Pop Expression of Print
+lw $a0 , 0($sp)
+la $t0 , str_bool
+sll $a0 , $a0 , 2
+add $a0 , $a0 , $t0
+lw $a0 , 0($a0)
+li $v0 , 4
+syscall
+# Bool Constant : true
+li $t0 , 1
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# Bool Constant : false
+li $t0, 0
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# And Expression
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+or $t0 , $t0 , $t1
+sw $t0 , 8($sp)
+addi $sp , $sp , 4
+# Print expr : 
+addi $sp , $sp , 4 # Pop Expression of Print
+lw $a0 , 0($sp)
+la $t0 , str_bool
+sll $a0 , $a0 , 2
+add $a0 , $a0 , $t0
+lw $a0 , 0($a0)
+li $v0 , 4
+syscall
+# Bool Constant : true
+li $t0 , 1
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# Bool Constant : true
+li $t0 , 1
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# And Expression
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+or $t0 , $t0 , $t1
+sw $t0 , 8($sp)
+addi $sp , $sp , 4
+# Print expr : 
+addi $sp , $sp , 4 # Pop Expression of Print
+lw $a0 , 0($sp)
+la $t0 , str_bool
+sll $a0 , $a0 , 2
+add $a0 , $a0 , $t0
+lw $a0 , 0($a0)
+li $v0 , 4
+syscall
+# Bool Constant : false
+li $t0, 0
 sw $t0 , 0($sp)
 addi $sp, $sp, -4
 # Negative an expression
 lw $t0 , 4($sp)
-neg $t0 , $t0
+beq $t0 , $zero , label0
+li $t0, 0
+j label1
+label0: 
+li $t0 , 1
+label1: 
 sw $t0 , 4($sp)
 # Print expr : 
 addi $sp , $sp , 4 # Pop Expression of Print
 lw $a0 , 0($sp)
-li $v0 , 1
+la $t0 , str_bool
+sll $a0 , $a0 , 2
+add $a0 , $a0 , $t0
+lw $a0 , 0($a0)
+li $v0 , 4
 syscall
-# Double Constant : 4.4
-li.s $f0, 4.4
-s.s $f0, 0($sp)
+# Bool Constant : true
+li $t0 , 1
+sw $t0 , 0($sp)
 addi $sp, $sp, -4
 # Negative an expression
-l.s $f0 , 4($sp)
-neg.s $f0 , $f0
-s.s $f0 , 4($sp)
+lw $t0 , 4($sp)
+beq $t0 , $zero , label2
+li $t0, 0
+j label3
+label2: 
+li $t0 , 1
+label3: 
+sw $t0 , 4($sp)
 # Print expr : 
 addi $sp , $sp , 4 # Pop Expression of Print
-l.s $f12 , 0($sp)
-li $v0 , 2
+lw $a0 , 0($sp)
+la $t0 , str_bool
+sll $a0 , $a0 , 2
+add $a0 , $a0 , $t0
+lw $a0 , 0($a0)
+li $v0 , 4
 syscall
 addi $sp , $sp , 0 # UnAllocate Stack Area (Removing Block Statement Variables)
 addi $fp ,$sp , 4

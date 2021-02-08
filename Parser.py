@@ -40,14 +40,34 @@ def create_parser():
         print_stmt : "print" "(" expr (","expr)* ")" ";" -> print_stmt
         expr : l_value "=" expr -> expr_assign
             | constant -> expr_constant
-            | l_value | "this" | call | "(" expr ")" 
+            | l_value 
+            | "this" 
+            | call 
+            | "(" expr ")" -> exp_inside_parenthesis
             | expr "+" expr -> exp_plus_exp
             | expr "-" expr -> exp_minus_exp
             | expr "*" expr -> exp_mul_exp
             | expr "/" expr -> exp_div_exp
             | expr "%" expr -> exp_mod_exp
             | "-" expr -> exp_negative
-            | expr "<" expr | expr "<=" expr | expr ">" expr | expr ">=" expr | expr "==" expr | expr "!=" expr | expr "&&" expr | expr "||" expr | "!" expr | "ReadInteger" "(" ")" |"readLine" "(" ")" | "new" ident | "NewArray" "(" expr "," type ")" | "itod" "(" expr ")" | "dtoi" "(" expr ")" | "itob" "(" expr ")" | "btoi" "(" expr ")"
+            | expr "<" expr -> exp_less_exp 
+            | expr "<=" expr -> exp_less_equal_exp
+            | expr ">" expr -> exp_greater_exp
+            | expr ">=" expr -> exp_greater_equal_exp
+            | expr "==" expr -> exp_equal_exp
+            | expr "!=" expr -> exp_not_equal_exp 
+            | expr "&&" expr -> exp_and_exp
+            | expr "||" expr -> exp_or_exp
+            | "!" expr -> exp_not
+            | "ReadInteger" "(" ")" 
+            |"readLine" "(" ")" 
+            | "new" ident 
+            | "NewArray" "(" expr "," type ")" 
+            | "itod" "(" expr ")" 
+            | "dtoi" "(" expr ")" 
+            | "itob" "(" expr ")" 
+            | "btoi" "(" expr ")"
+            
         l_value : ident | expr "." ident | expr "[" expr "]"
         call : ident "(" actuals ")" | expr "." ident "(" actuals ")"
         actuals : expr ("," expr)* | 
