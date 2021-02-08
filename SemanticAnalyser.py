@@ -16,11 +16,7 @@ class MyTransformer(Transformer):
             return 'null'
         return value
 
-    def exp_plus_exp(self, values):
-        if values[0] == values[1]:
-            return values[0]
-        else:
-         raise Exception("can not add this types")
+
 
     def f(self, values):
         return values[0]

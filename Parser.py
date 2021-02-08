@@ -42,7 +42,12 @@ def create_parser():
             | constant -> expr_constant
             | l_value | "this" | call | "(" expr ")" 
             | expr "+" expr -> exp_plus_exp
-            | expr "-" expr | expr "*" expr | expr "/" expr | expr "%" expr | "-" expr | expr "<" expr | expr "<=" expr | expr ">" expr | expr ">=" expr | expr "==" expr | expr "!=" expr | expr "&&" expr | expr "||" expr | "!" expr | "ReadInteger" "(" ")" |"readLine" "(" ")" | "new" ident | "NewArray" "(" expr "," type ")" | "itod" "(" expr ")" | "dtoi" "(" expr ")" | "itob" "(" expr ")" | "btoi" "(" expr ")"
+            | expr "-" expr -> exp_minus_exp
+            | expr "*" expr -> exp_mul_exp
+            | expr "/" expr -> exp_div_exp
+            | expr "%" expr -> exp_mod_exp
+            | "-" expr -> exp_negative
+            | expr "<" expr | expr "<=" expr | expr ">" expr | expr ">=" expr | expr "==" expr | expr "!=" expr | expr "&&" expr | expr "||" expr | "!" expr | "ReadInteger" "(" ")" |"readLine" "(" ")" | "new" ident | "NewArray" "(" expr "," type ")" | "itod" "(" expr ")" | "dtoi" "(" expr ")" | "itob" "(" expr ")" | "btoi" "(" expr ")"
         l_value : ident | expr "." ident | expr "[" expr "]"
         call : ident "(" actuals ")" | expr "." ident "(" actuals ")"
         actuals : expr ("," expr)* | 

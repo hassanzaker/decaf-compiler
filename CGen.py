@@ -7,6 +7,7 @@ from lark import Lark, Transformer
 class Cgen(Transformer):
     def __init__(self):
         self.data_code = ''
+        self.string_numbers = 0
 
     def log_code(self, code):
         dirname = os.path.dirname(__file__)
@@ -15,25 +16,125 @@ class Cgen(Transformer):
         file.close()
 
 
+########### Arethmatic ###############
 
     def exp_plus_exp(self, args):
-        value_type = args[0]['value_type']
+        value_type1 = args[0]['value_type']
+        value_type2 = args[1]['value_type']
         code = "# Add Expression\n"
-        if value_type == 'int':
+        if value_type1 == 'int' and value_type2 == value_type1:
             code += "lw $t0 , 8($sp)\n"
             code += "lw $t1 , 4($sp)\n"
             code += "add $t0 , $t0 , $t1\n"
             code += "sw $t0 , 8($sp)\n"
-        elif value_type == 'double':
+        elif value_type1 == 'double' and value_type2 == value_type1:
             code += "l.s $f0 , 8($sp)\n"
             code += "l.s $f1 , 4($sp)\n"
             code += "add.s $f0 , $f0 , $f1\n"
             code += "s.s $f0 , 8($sp)\n"
+        #TODO --> append two string (or array) when we want to add them
         else:
-            raise Exception("Unhandled Type for Add !")
+            raise Exception("Can Not Add " + value_type1 + " to " + value_type2 + "!")
         code += "addi $sp , $sp , 4\n"
         return {'code': args[0]['code'] + args[1]['code'] + code,
+                'value_type': value_type1}
+
+    def exp_minus_exp(self, args):
+        value_type1 = args[0]['value_type']
+        value_type2 = args[1]['value_type']
+        code = "# Add Expression\n"
+        if value_type1 == 'int' and value_type2 == value_type1:
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "sub $t0 , $t0 , $t1\n"
+            code += "sw $t0 , 8($sp)\n"
+        elif value_type1 == 'double' and value_type2 == value_type1:
+            code += "l.s $f0 , 8($sp)\n"
+            code += "l.s $f1 , 4($sp)\n"
+            code += "sub.s $f0 , $f0 , $f1\n"
+            code += "s.s $f0 , 8($sp)\n"
+        else:
+            raise Exception("Can Not Subtract " + value_type1 + " from " + value_type2 + "!")
+        code += "addi $sp , $sp , 4\n"
+        return {'code': args[0]['code'] + args[1]['code'] + code,
+                'value_type': value_type1}
+
+    def exp_mul_exp(self, args):
+        value_type1 = args[0]['value_type']
+        value_type2 = args[1]['value_type']
+        code = "# Add Expression\n"
+        if value_type1 == 'int' and value_type2 == value_type1:
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "mul $t0 , $t0 , $t1\n"
+            code += "sw $t0 , 8($sp)\n"
+        elif value_type1 == 'double' and value_type2 == value_type1:
+            code += "l.s $f0 , 8($sp)\n"
+            code += "l.s $f1 , 4($sp)\n"
+            code += "mul.s $f0 , $f0 , $f1\n"
+            code += "s.s $f0 , 8($sp)\n"
+        else:
+            raise Exception("Can Not do Multiplication " + value_type1 + " with " + value_type2 + "!")
+        code += "addi $sp , $sp , 4\n"
+        return {'code': args[0]['code'] + args[1]['code'] + code,
+                'value_type': value_type1}
+
+    def exp_div_exp(self, args):
+        value_type1 = args[0]['value_type']
+        value_type2 = args[1]['value_type']
+        code = "# Add Expression\n"
+        if value_type1 == 'int' and value_type2 == value_type1:
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "div $t0 , $t0 , $t1\n"
+            code += "sw $t0 , 8($sp)\n"
+        elif value_type1 == 'double' and value_type2 == value_type1:
+            code += "l.s $f0 , 8($sp)\n"
+            code += "l.s $f1 , 4($sp)\n"
+            code += "div.s $f0 , $f0 , $f1\n"
+            code += "s.s $f0 , 8($sp)\n"
+        else:
+            raise Exception("Can Not Divide " + value_type1 + " from " + value_type2 + "!")
+        code += "addi $sp , $sp , 4\n"
+        return {'code': args[0]['code'] + args[1]['code'] + code,
+                'value_type': value_type1}
+
+    def exp_mod_exp(self, args):
+        value_type1 = args[0]['value_type']
+        value_type2 = args[1]['value_type']
+        code = "# Add Expression\n"
+        if value_type1 == 'int' and value_type2 == value_type1:
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "div $t0 , $t1\n"
+            code += "mfhi $t0\n"
+            code += "sw $t0 , 8($sp)\n"
+        else:
+            raise Exception("this operator is just for int by int !")
+        code += "addi $sp , $sp , 4\n"
+        return {'code': args[0]['code'] + args[1]['code'] + code,
+                'value_type': 'int'}
+
+    def exp_negative(self, args):
+        value_type = args[0]['value_type']
+        code = '# Negative an expression\n'
+        if value_type == 'int':
+            code += "lw $t0 , 4($sp)\n"
+            code += "neg $t0 , $t0\n"
+            code += "sw $t0 , 4($sp)\n"
+        elif value_type == 'double':
+            code += "l.s $f0 , 4($sp)\n"
+            code += "neg.s $f0 , $f0\n"
+            code += "s.s $f0 , 4($sp)\n"
+        else:
+            raise Exception("can not negative " + value_type + " !")
+        return {'code': args[0]['code'] + code,
                 'value_type': value_type}
+
+#######################################
+
+
+####################### Type  ###########################
     def type_int(self, args):
         return "int"
 
@@ -143,7 +244,8 @@ class Cgen(Transformer):
 
     ############### String Constant ###############
     def constant_string(self, args):
-        name = self.data_name_generator()
+        name = 'str' + str(self.string_numbers)
+        self.string_numbers += 1
         code = "# String Constant : " + args[0].value + "\n"
         code += 'la $t0 , ' + name + '\n'
         code += 'sw $t0 , 0($sp)\n'
@@ -152,7 +254,7 @@ class Cgen(Transformer):
         return {'code': code,
                 'value_type': 'string'}
 
-    ############### String Constant ###############
+    ############### Null Constant ###############
     def constant_null(self, args):
         code = "la $t0 , obj_null # Null Object\n"
         code += "sw $t0 , 0($sp)\n"
@@ -179,10 +281,11 @@ class Cgen(Transformer):
         return args[0]
 
     def print_stmt(self, args):
+        code = ''
         for arg in args:
             expr = arg
             expr_type = expr['value_type']
-            code = expr['code']
+            code += expr['code']
             code += "# Print expr : \n"
             code += "addi $sp , $sp , 4 # Pop Expression of Print\n"
             if expr_type == "string":
@@ -215,6 +318,7 @@ class Cgen(Transformer):
         code = '.text\n'
         code += '.globl main\n'
         code += default_functions
+        code += "\n"
         for arg in args:
             code += arg['code']
         self.data_code += "str_false : .asciiz \"false\" \n"
