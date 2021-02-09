@@ -4,9 +4,7 @@ from CGen import *
 
 text = """
 int main() {
-    print(4 * 3 + 2);
-    print(3.2 * 2.5);
-    print(6 / 4);
+    print(1.3e-2);
 }
 """
 tree = parse_text(text)

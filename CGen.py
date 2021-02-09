@@ -480,6 +480,17 @@ class Cgen(Transformer):
         return {'code': code,
                 'value_type': 'double'}
 
+    def constant_double2(self, args):
+        parts = re.split(r"[Ee]", args[0])
+        value = float(parts[0]) * (10 ** int(parts[1]))
+        print(value)
+        code = "# Double Constant : " + str(value) + "\n"
+        code += "li.s $f0, " + str(value) + "\n"
+        code += "s.s $f0, 0($sp)\n"
+        code += "addi $sp, $sp, -4\n"
+        return {'code': code,
+                'value_type': 'double'}
+
     ############### Bool Constant ###############
     def constant_bool(self, args):
         code = "# Bool Constant : " + str(args[0].value) + "\n"

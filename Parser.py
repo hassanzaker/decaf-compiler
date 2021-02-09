@@ -73,7 +73,7 @@ def create_parser():
         actuals : expr ("," expr)* | 
         constant : INT -> constant_int
         | DOUBLE -> constant_double
-        | DOUBLE_SCI 
+        | DOUBLE_SCI -> constant_double2
         | BOOL -> constant_bool
         |  STRING -> constant_string
         | "null" -> constant_null
