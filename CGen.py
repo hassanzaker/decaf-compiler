@@ -1,11 +1,12 @@
 import os
 import re
-
+from ClassTable import Classes, Class
 from lark import Lark, Transformer
 
 
 class Cgen(Transformer):
-    def __init__(self):
+    def __init__(self, classes):
+        self.classes = classes
         self.data_code = ''
         self.string_numbers = 0
         self.label_number = 0

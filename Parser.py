@@ -8,22 +8,37 @@ def create_parser():
         program : (decl)+ -> program
         decl : variable_decl 
             | function_decl -> decl_function_decl
-            | class_decl | interface_decl
-        variable_decl : variable ";"
-        variable : type ident | ident_type ident
+            | class_decl -> decl_class_decl
+            | interface_decl
+        variable_decl : variable ";" -> variable_decl
+        variable : type ident -> variable_type_primitive
+            | ident_type ident -> variable_type_class
+            
         type: "int" -> type_int
             | "double" -> type_double
             | "bool" -> type_bool
             | "string" -> type_string
             | type "[]" -> type_array
+            
         ident_type : ident -> type_id
+        
         function_decl : type ident "(" formals ")" stmt_block -> func_decl
-            | "void" ident "(" formals ")" stmt_block
+            | ident_type ident "(" formals ")" stmt_block -> func_decl_data_type
+            | "void" ident "(" formals ")" stmt_block -> function_void_decl
+            
         formals : variable ("," variable)* 
             |  -> formals_empty
-        class_decl : "class" ident ("extends" ident)?  ("implements" ident ("," ident)*)?  "{" (field)* "}"
-        field : access_mode variable_decl | access_mode function_decl
-        access_mode : "private" | "protected" | "public" | 
+            
+        class_decl : "class" ident class_extend  class_implement class_fields -> class_decl
+        class_extend : ("extends" ident)? -> class_decl_extend
+        class_implement : ("implements" ident ("," ident)*)?
+        class_fields : "{" (field)* "}" -> class_decl_fields
+        field : access_mode variable_decl -> variable_field
+            | access_mode function_decl -> method_field
+        access_mode : "private" -> private_access
+            | "protected" -> protected_access
+            | "public" -> public_access
+            |  -> default_access
         interface_decl : "interface" ident "{" (prototype)* "}"
         prototype : type ident "(" formals ")" ";" | "void" ident "(" formals ")" ";"
         stmt_block : "{" (variable_decl)* (stmt)* "}" -> stmt_block
@@ -80,7 +95,6 @@ def create_parser():
             |  STRING -> constant_string
             | "null" -> constant_null
 
-        NEW : "new"
         DOUBLE.2 : /(\\d)+\\.(\\d)*/
         DOUBLE_SCI.3 : /(\\d)+\\.(\\d)*[Ee][+-]?(\\d)+/
         INT: /0[xX][a-fA-F0-9]+/ | /[0-9]+/
