@@ -554,7 +554,12 @@ class Cgen(Transformer):
             else:
                 code += "lw $a0 , 0($sp)\n"
                 code += "li $v0 , 1\n"
+
             code += "syscall\n"
+
+        code += "li $v0 , 4\n"
+        code += "la $a0 , new_line\n"
+        code += "syscall\n"
         return {'code': code}
 
     def decl_function_decl(self, args):
@@ -573,6 +578,7 @@ class Cgen(Transformer):
             code += arg['code']
         self.data_code += "str_false : .asciiz \"false\" \n"
         self.data_code += "str_true : .asciiz \"true\" \n"
+        self.data_code += "new_line : .asciiz \"\n\" \n"
         self.data_code += "str_bool : .word str_false , str_true\n"
         self.data_code += "obj_null : .word 61235\n"
         self.log_code(code + "\n\n.data\n" + self.data_code)

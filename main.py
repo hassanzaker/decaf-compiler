@@ -4,9 +4,9 @@ from CGen import *
 
 text = """
 int main() {
-    print(false && false, false && true, true && false, true && true);
-    print(false || false, false || true, true || false, true || true);
-    print(!false, !true);
+    print(4 * 3 + 2);
+    print(3.2 * 2.5);
+    print(6 / 4);
 }
 """
 tree = parse_text(text)
