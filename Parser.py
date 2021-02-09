@@ -28,10 +28,11 @@ def create_parser():
         prototype : type ident "(" formals ")" ";" | "void" ident "(" formals ")" ";"
         stmt_block : "{" (variable_decl)* (stmt)* "}" -> stmt_block
         stmt : (expr)? ";" -> stmt_expr
-            | if_stmt | while_stmt | for_stmt | break_stmt | continue_stmt | return_stmt 
+            | if_stmt -> stmt_if_stmt
+            | while_stmt | for_stmt | break_stmt | continue_stmt | return_stmt 
             | print_stmt -> stmt_print_stmt
             | stmt_block
-        if_stmt : "if" "(" expr ")" stmt ("else" stmt)?
+        if_stmt : "if" "(" expr ")" stmt ("else" stmt)? -> if_stmt
         while_stmt : "while" "(" expr ")" stmt
         for_stmt: "for" "(" (expr)? ";" expr ";" (expr)? ")" stmt
         return_stmt : "return" (expr)? ";"
@@ -71,12 +72,13 @@ def create_parser():
         l_value : ident | expr "." ident | expr "[" expr "]"
         call : ident "(" actuals ")" | expr "." ident "(" actuals ")"
         actuals : expr ("," expr)* | 
+        
         constant : INT -> constant_int
-        | DOUBLE -> constant_double
-        | DOUBLE_SCI -> constant_double2
-        | BOOL -> constant_bool
-        |  STRING -> constant_string
-        | "null" -> constant_null
+            | DOUBLE -> constant_double
+            | DOUBLE_SCI -> constant_double2
+            | BOOL -> constant_bool
+            |  STRING -> constant_string
+            | "null" -> constant_null
 
         NEW : "new"
         DOUBLE.2 : /(\\d)+\\.(\\d)*/
