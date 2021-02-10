@@ -7,8 +7,9 @@ text = """
 
 
 int main() {
-    for(;4<5;){
+    while(4<5){
     print(false);
+    break;
     }
     
 }

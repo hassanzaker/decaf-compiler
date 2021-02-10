@@ -14,6 +14,8 @@ class Cgen(Transformer):
         self.data_code = ''
         self.string_numbers = 0
         self.label_number = 0
+        self.break_labels = 0
+        self.continue_labels = 0
 
     def log_code(self, code):
         dirname = os.path.dirname(__file__)
@@ -433,6 +435,7 @@ class Cgen(Transformer):
 
     def stmt_expr(self, args):
         if len(args) > 0:
+            print(args[0]['code'] , "i have error")
             code = args[0]['code']
             code += "# End of Expression Optional\n"
             code += "addi $sp , $sp 4\n"
@@ -556,6 +559,28 @@ class Cgen(Transformer):
     def stmt_for_stmt(self, args):
         print(args[0] ,"for stmt")
         return args[0]
+
+    def break_stmt(self,args):
+        code = "@" + "break" + str(self.break_labels) + "@\n"
+        self.break_labels += 1
+        return {'code' : code}
+
+    def continue_stmt(self, args):
+        code = "@" + "continue" + str(self.continue_labels) + "@\n"
+        self.continue_labels += 1
+        return {'code' : code}
+
+    def stmt_break_stmt(self , args):
+        print(args)
+        args[0]['break_labels'] = [{'name' : args[0]['code'][1:-2] , 'count' : 0}]
+        return args[0]
+
+    def stmt_continue_stmt(self,args):
+        args[0]['continue'] = [{'name' : args[0]['code'][1:-2] , 'count' : 0}]
+        return args[0]
+
+
+
 
     def constant_int(self, args):
         val = int(args[0].value, 0)

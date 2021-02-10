@@ -46,16 +46,18 @@ def create_parser():
         stmt : (expr)? ";" -> stmt_expr
             | if_stmt -> stmt_if_stmt
             | while_stmt -> stmt_while_stmt
-             | for_stmt -> stmt_for_stmt
-              | break_stmt | continue_stmt | return_stmt 
+            | for_stmt -> stmt_for_stmt
+            | break_stmt -> stmt_break_stmt
+            | continue_stmt -> stmt_continue_stmt
+            | return_stmt 
             | print_stmt -> stmt_print_stmt
             | stmt_block
         if_stmt : "if" "(" expr ")" stmt ("else" stmt)? -> if_stmt
         while_stmt : "while" "(" expr ")" stmt -> while_stmt
         for_stmt: "for" "(" (expr)? ";" expr ";" (expr)? ")" stmt ->for_stmt
         return_stmt : "return" (expr)? ";"
-        break_stmt : "break;"
-        continue_stmt : "continue;"
+        break_stmt : "break;" -> break_stmt
+        continue_stmt : "continue;" ->continue_stmt
         print_stmt : "print" "(" expr (","expr)* ")" ";" -> print_stmt
         expr : l_value "=" expr -> expr_assign
             | constant -> expr_constant
