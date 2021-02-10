@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f72968f3-da95-4d80-a7b1-2346417fd40e" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/decaf-compiler.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/decaf-compiler.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="f72968f3-da95-4d80-a7b1-2346417fd40e" name="Default Changelist" comment="while added">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CGen.py" beforeDir="false" afterPath="$PROJECT_DIR$/CGen.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/Parser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SemanticAnalyser.py" beforeDir="false" afterPath="$PROJECT_DIR$/SemanticAnalyser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code.s" beforeDir="false" afterPath="$PROJECT_DIR$/code.s" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -197,6 +191,10 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="while added" />
+    <option name="LAST_COMMIT_MESSAGE" value="while added" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

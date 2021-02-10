@@ -46,7 +46,7 @@ def create_parser():
         stmt : (expr)? ";" -> stmt_expr
             | if_stmt -> stmt_if_stmt
             | while_stmt -> stmt_while_stmt
-             | for_stmt ->stmt_for_stmt
+             | for_stmt -> stmt_for_stmt
               | break_stmt | continue_stmt | return_stmt 
             | print_stmt -> stmt_print_stmt
             | stmt_block

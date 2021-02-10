@@ -517,7 +517,41 @@ class Cgen(Transformer):
         return  {'code': args[0]['code'] + code}
 
     def for_stmt(self, args):
-        pass
+        print(len(args) ,"for stmt 2")
+        number_of_elem = len(args)
+        stmt = args[number_of_elem - 1]
+        first_label = "label" + str(self.string_numbers)
+        self.string_numbers += 1
+        second_label = "label" + str(self.string_numbers)
+        self.string_numbers += 1
+        if number_of_elem == 4:
+            initialize = args[0]
+            condition = args[1]
+            step = args[2]
+        else:
+            if number_of_elem == 2:
+                condition = args[0]
+            else:
+                pass
+        code = "# Initialization Expression of Loop for\n"
+        code += ''  #should add initialize term
+        # if expr_initialization['code'] != '':
+        #     code += "addi $sp , $sp , 4 # pop init expr of loop for\n"
+        code += first_label + ": # Starting for Loop Body\n"
+        code += "# Calculating For Loop Condition\n"
+        code += condition['code']
+        code += "# Loading For Loop Condition Result\n"
+        code += "addi $sp , $sp , 4\n"
+        code += "lw $t0 , 0($sp)\n"
+        code += "beqz $t0 , " + second_label + " # Jumping to end label if Condition Expression of for loop is false\n"
+        code += stmt['code']
+        code += "# Step Expression of For loop \n"
+        code += '' #should add step
+        # if expr_step['code'] != '':
+        #     code += "addi $sp , $sp , 4 # pop step expr of loop for\n"
+        code += "j " + second_label + " # Jumping to beggining of while loop\n"
+        code += second_label + ":\n"
+        return {'code' : code , 'break_labels' : []}
 
     def stmt_for_stmt(self, args):
         print(args[0] ,"for stmt")
