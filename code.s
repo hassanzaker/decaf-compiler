@@ -172,61 +172,22 @@ addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5
 # Begin of Statement Block
 addi $sp , $sp , -0 # Allocate From Stack For Block Statement Variables
 addi $fp , $sp , 4
-# Int Constant : 33
-li $t0 , 33
-sw $t0 , 0($sp)
-addi $sp, $sp, -4
-# Int Constant : 8
-li $t0 , 8
-sw $t0 , 0($sp)
-addi $sp, $sp, -4
-# Int Constant : 4
-li $t0 , 4
-sw $t0 , 0($sp)
-addi $sp, $sp, -4
-# div Expression
-lw $t0 , 8($sp)
-lw $t1 , 4($sp)
-mul $t0 , $t0 , $t1
-sw $t0 , 8($sp)
-addi $sp , $sp , 4
-# greater equal than Expression
-lw $t0 , 8($sp)
-lw $t1 , 4($sp)
-sge $t0 , $t0 , $t1
-sw $t0 , 8($sp)
-addi $sp , $sp , 4
-addi $sp , $sp , 4
-lw $t0 , 0($sp)
-beq $t0 , $zero , label0
-# Int Constant : 1
-li $t0 , 1
+# Bool Constant : false
+li $t0, 0
 sw $t0 , 0($sp)
 addi $sp, $sp, -4
 # Print expr : 
 addi $sp , $sp , 4 # Pop Expression of Print
 lw $a0 , 0($sp)
-li $v0 , 1
+la $t0 , str_bool
+sll $a0 , $a0 , 2
+add $a0 , $a0 , $t0
+lw $a0 , 0($a0)
+li $v0 , 4
 syscall
 li $v0 , 4
 la $a0 , new_line
 syscall
-j label1
-label0 :
-# Int Constant : 2
-li $t0 , 2
-sw $t0 , 0($sp)
-addi $sp, $sp, -4
-# Print expr : 
-addi $sp , $sp , 4 # Pop Expression of Print
-lw $a0 , 0($sp)
-li $v0 , 1
-syscall
-li $v0 , 4
-la $a0 , new_line
-syscall
-label1 :
-#End of if statement
 addi $sp , $sp , 0 # UnAllocate Stack Area (Removing Block Statement Variables)
 addi $fp ,$sp , 4
 # End of Statement Block

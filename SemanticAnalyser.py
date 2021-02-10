@@ -1,6 +1,6 @@
 from lark import Lark, Transformer
 from ClassTable import Classes, Class
-
+arr=[]
 class MyTransformer(Transformer):
     def __init__(self):
         self.classes = Classes()
@@ -14,11 +14,17 @@ class MyTransformer(Transformer):
     def STRING(self, token):
         return 'str'
     def BOOL(self, token):
+        arr.append(token)
+        # print(arr)
         return 'bool'
     def constant(self, value):
+        print("salla")
         if len(value) == 0:
             return 'null'
         return value
+    def stmt_block(self,token):
+        print("hi")
+        return token
 
 ####################### Type  ###########################
     def type_int(self, args):

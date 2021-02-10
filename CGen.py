@@ -5,8 +5,12 @@ from lark import Lark, Transformer
 
 
 class Cgen(Transformer):
-    def __init__(self, classes):
-        self.classes = classes
+    # def __init__(self, classes):
+    #     self.classes = classes
+    #     self.data_code = ''
+    #     self.string_numbers = 0
+    #     self.label_number = 0
+    def __init__(self):
         self.data_code = ''
         self.string_numbers = 0
         self.label_number = 0
@@ -17,8 +21,7 @@ class Cgen(Transformer):
         file.write(code)
         file.close()
 
-
-########### Arethmatic ###############
+    ########### Arethmatic ###############
 
     def exp_plus_exp(self, args):
         value_type1 = args[0]['value_type']
@@ -34,7 +37,7 @@ class Cgen(Transformer):
             code += "l.s $f1 , 4($sp)\n"
             code += "add.s $f0 , $f0 , $f1\n"
             code += "s.s $f0 , 8($sp)\n"
-        #TODO --> append two string (or array) when we want to add them
+        # TODO --> append two string (or array) when we want to add them
         else:
             raise Exception("Can Not Add " + value_type1 + " to " + value_type2 + "!")
         code += "addi $sp , $sp , 4\n"
@@ -224,7 +227,6 @@ class Cgen(Transformer):
         return {'code': args[0]['code'] + args[1]['code'] + code,
                 'value_type': 'bool'}
 
-
     def exp_greater_equal_exp(self, args):
         value_type1 = args[0]['value_type']
         value_type2 = args[1]['value_type']
@@ -290,7 +292,6 @@ class Cgen(Transformer):
         return {'code': args[0]['code'] + args[1]['code'] + code,
                 'value_type': 'bool'}
 
-
     def exp_not_equal_exp(self, args):
         value_type1 = args[0]['value_type']
         value_type2 = args[1]['value_type']
@@ -325,7 +326,6 @@ class Cgen(Transformer):
         code += "addi $sp , $sp , 4\n"
         return {'code': args[0]['code'] + args[1]['code'] + code,
                 'value_type': 'bool'}
-
 
     ########################## Logical ####################33
     def exp_and_exp(self, args):
@@ -378,14 +378,13 @@ class Cgen(Transformer):
             raise Exception(value_type + " should be bool !")
         return {'code': args[0]['code'] + code,
                 'value_type': value_type}
-#######################################
+
+    #######################################
 
     def exp_inside_parenthesis(self, args):
         return args[0];
 
-
-
-####################### Type  ###########################
+    ####################### Type  ###########################
     def type_int(self, args):
         return "int"
 
@@ -451,12 +450,12 @@ class Cgen(Transformer):
                 stmts.append(arg)
         code = "# Begin of Statement Block\n"
         code += "addi $sp , $sp , -" + str(
-           variable_count * 4) + " # Allocate From Stack For Block Statement Variables\n"
+            variable_count * 4) + " # Allocate From Stack For Block Statement Variables\n"
         code += "addi $fp , $sp , 4\n"
         for stmt in stmts:
             code += stmt['code']
         code += "addi $sp , $sp , " + str(
-           variable_count * 4) + " # UnAllocate Stack Area (Removing Block Statement Variables)\n"
+            variable_count * 4) + " # UnAllocate Stack Area (Removing Block Statement Variables)\n"
         code += "addi $fp ,$sp , 4\n"
         code += "# End of Statement Block\n"
 
@@ -464,6 +463,7 @@ class Cgen(Transformer):
 
     def if_stmt(self, args):
         exp = args[0]
+        print(exp,"exp")
         stmt_true = args[1]
         stmt_false = args[2]
         first_label = "label" + str(self.string_numbers)
@@ -486,8 +486,42 @@ class Cgen(Transformer):
 
     def stmt_if_stmt(self, args):
         code = "#End of if statement\n"
-        return {'code' : args[0]['code'] + code}
+        return {'code': args[0]['code'] + code}
 
+    def while_stmt(self, args):
+
+        print(args[1] , "args 0 ")
+        exp = args[0]
+        stmt =  args[1]
+        first_label = "label" + str(self.string_numbers)
+        self.string_numbers += 1
+        second_label = "label" + str(self.string_numbers)
+        self.string_numbers += 1
+        if exp["value_type"] == "bool":
+            code = first_label + ": # Starting While Loop Body\n"
+            code += "# Calculating While Condition\n"
+            code += exp['code']
+            code += "# Loading While Condition Result\n"
+            code += "addi $sp , $sp , 4\n"
+            code += "lw $t0 , 0($sp)\n"
+            code += "beqz $t0 , " + second_label + " # Jumping to end label if expression is false\n"
+            code += stmt['code']
+            code += "j " + first_label + " # Jumping to beggining of while loop\n"
+            code += second_label + ":\n"
+        else:
+            raise Exception("condition should be bool type!")
+        return {'code' : code , 'break_labels' : []}
+
+    def stmt_while_stmt(self, args):
+        code = "#End of while statement\n"
+        return  {'code': args[0]['code'] + code}
+
+    def for_stmt(self, args):
+        pass
+
+    def stmt_for_stmt(self, args):
+        print(args[0] ,"for stmt")
+        return args[0]
 
     def constant_int(self, args):
         val = int(args[0].value, 0)
@@ -550,9 +584,9 @@ class Cgen(Transformer):
         code += "addi $sp , $sp , -4\n"
         return {'code': code, 'value_type': 'null_type'}
 
-
     def func_decl(self, args):
         returnType = args[0]
+        print("kiiiririri")
         functionName = args[1].children[0]
         formals = args[2]
         stmt_block = args[3]
@@ -602,6 +636,7 @@ class Cgen(Transformer):
         return {'code': code}
 
     def decl_function_decl(self, args):
+        # print(args[0] , "decl_func")
         return args[0]
 
     def program(self, args):
