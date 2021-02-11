@@ -491,6 +491,12 @@ class Cgen(Transformer):
         code = "#End of if statement\n"
         return {'code': args[0]['code'] + code}
 
+    def find_break_label(self , arr , name):
+        for item in arr:
+            if item['name'] == name:
+                return item['count']
+        raise Exception("no label found for " + name)
+
     def while_stmt(self, args):
 
         print(args[1] , "args 0 ")
@@ -500,6 +506,16 @@ class Cgen(Transformer):
         self.string_numbers += 1
         second_label = "label" + str(self.string_numbers)
         self.string_numbers += 1
+
+        break_labels = stmt['break_labels']
+        pattern = re.compile(r'@(break\d+)@')
+        for break_label in re.findall(pattern, stmt['code']):
+            count = self.find_break_label(break_labels , break_label)
+            code_for_break = "addi $sp , $sp , " + str(count * 4) + " # Pop elements before\n"
+            code_for_break += "addi $fp , $sp , 4 # Set Frame Pointer\n"
+            code_for_break += "j " + second_label + " # Break from loop while\n"
+            stmt['code'] = stmt['code'].replace("@" + break_label + "@" , code_for_break)
+
         if exp["value_type"] == "bool":
             code = first_label + ": # Starting While Loop Body\n"
             code += "# Calculating While Condition\n"
@@ -527,6 +543,16 @@ class Cgen(Transformer):
         self.string_numbers += 1
         second_label = "label" + str(self.string_numbers)
         self.string_numbers += 1
+
+        break_labels = stmt['break_labels']
+        pattern = re.compile(r'@(break\d+)@')
+        for break_label in re.findall(pattern, stmt['code']):
+            count = self.find_break_label(break_labels, break_label)
+            code_for_break = "addi $sp , $sp , " + str(count * 4) + " # Pop elements before\n"
+            code_for_break += "addi $fp , $sp , 4 # Set framepointer\n"
+            code_for_break += "j " + second_label + " # Break from loop for\n"
+            stmt['code'] = stmt['code'].replace("@" + break_label + "@", code_for_break)
+
         if number_of_elem == 4:
             initialize = args[0]
             condition = args[1]

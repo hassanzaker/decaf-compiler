@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f72968f3-da95-4d80-a7b1-2346417fd40e" name="Default Changelist" comment="add for stmt">
+    <list default="true" id="f72968f3-da95-4d80-a7b1-2346417fd40e" name="Default Changelist" comment="add functions for break and continue">
+      <change afterPath="$PROJECT_DIR$/Variable.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CGen.py" beforeDir="false" afterPath="$PROJECT_DIR$/CGen.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/Parser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SemanticAnalyser.py" beforeDir="false" afterPath="$PROJECT_DIR$/SemanticAnalyser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -196,7 +197,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="while added" />
     <MESSAGE value="add for stmt" />
-    <option name="LAST_COMMIT_MESSAGE" value="add for stmt" />
+    <MESSAGE value="add functions for break and continue" />
+    <option name="LAST_COMMIT_MESSAGE" value="add functions for break and continue" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

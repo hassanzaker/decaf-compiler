@@ -1,5 +1,7 @@
 from lark import Lark, Transformer
 from ClassTable import Classes, Class
+import re
+
 arr=[]
 class MyTransformer(Transformer):
     def __init__(self):
@@ -107,6 +109,7 @@ class MyTransformer(Transformer):
         return {'type': args[0], 'name': args[1].children[0][0]}
 
     def variable_type_class(self, args):
+        print(args[0].value ,  "value_type")
         return {'type': args[0].value , 'name': args[1].children[0][0]}
 
     def public_access(self, args):
@@ -124,4 +127,7 @@ class MyTransformer(Transformer):
     def program(self, args):
         self.classes.Inheritance()
         return
+
+    def expr_assign(self,args):
+        print(args[1].children[0].children,"khobi?")
 

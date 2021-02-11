@@ -9,7 +9,6 @@ text = """
 int main() {
     while(4<5){
     print(false);
-    break;
     }
     
 }
