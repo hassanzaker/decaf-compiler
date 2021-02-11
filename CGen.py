@@ -435,7 +435,6 @@ class Cgen(Transformer):
 
     def stmt_expr(self, args):
         if len(args) > 0:
-            print(args[0]['code'] , "i have error")
             code = args[0]['code']
             code += "# End of Expression Optional\n"
             code += "addi $sp , $sp 4\n"
@@ -451,22 +450,23 @@ class Cgen(Transformer):
                 variable_count += arg['variable_count']
             else:
                 stmts.append(arg)
+
+        break_labels = []
         code = "# Begin of Statement Block\n"
         code += "addi $sp , $sp , -" + str(
             variable_count * 4) + " # Allocate From Stack For Block Statement Variables\n"
         code += "addi $fp , $sp , 4\n"
         for stmt in stmts:
             code += stmt['code']
+            break_labels.extend(stmt['break_labels'])
         code += "addi $sp , $sp , " + str(
             variable_count * 4) + " # UnAllocate Stack Area (Removing Block Statement Variables)\n"
         code += "addi $fp ,$sp , 4\n"
         code += "# End of Statement Block\n"
-
-        return {'code': code}
+        return {'code': code, 'break_labels': break_labels}
 
     def if_stmt(self, args):
         exp = args[0]
-        print(exp,"exp")
         stmt_true = args[1]
         stmt_false = args[2]
         first_label = "label" + str(self.string_numbers)
@@ -487,6 +487,10 @@ class Cgen(Transformer):
             raise Exception("condition should be bool type!")
         return {'code': code}
 
+
+    def stmt_stmt_block(self, args):
+        return args[0]
+
     def stmt_if_stmt(self, args):
         code = "#End of if statement\n"
         return {'code': args[0]['code'] + code}
@@ -498,15 +502,13 @@ class Cgen(Transformer):
         raise Exception("no label found for " + name)
 
     def while_stmt(self, args):
-
-        print(args[1] , "args 0 ")
         exp = args[0]
-        stmt =  args[1]
+        stmt = args[1]
         first_label = "label" + str(self.string_numbers)
         self.string_numbers += 1
         second_label = "label" + str(self.string_numbers)
         self.string_numbers += 1
-
+        print(stmt)
         break_labels = stmt['break_labels']
         pattern = re.compile(r'@(break\d+)@')
         for break_label in re.findall(pattern, stmt['code']):
@@ -529,14 +531,13 @@ class Cgen(Transformer):
             code += second_label + ":\n"
         else:
             raise Exception("condition should be bool type!")
-        return {'code' : code , 'break_labels' : []}
+        return {'code' : code , 'break_labels': []}
 
     def stmt_while_stmt(self, args):
         code = "#End of while statement\n"
-        return  {'code': args[0]['code'] + code}
+        return  {'code': args[0]['code'] + code, 'break_labels': args[0]['break_labels']}
 
     def for_stmt(self, args):
-        print(len(args) ,"for stmt 2")
         number_of_elem = len(args)
         stmt = args[number_of_elem - 1]
         first_label = "label" + str(self.string_numbers)
@@ -583,7 +584,6 @@ class Cgen(Transformer):
         return {'code' : code , 'break_labels' : []}
 
     def stmt_for_stmt(self, args):
-        print(args[0] ,"for stmt")
         return args[0]
 
     def break_stmt(self,args):
@@ -597,13 +597,10 @@ class Cgen(Transformer):
         return {'code' : code}
 
     def stmt_break_stmt(self , args):
-        print(args)
-        args[0]['break_labels'] = [{'name' : args[0]['code'][1:-2] , 'count' : 0}]
-        return args[0]
+        return {'code' : args[0]['code'], 'break_labels': [{'name' : args[0]['code'][1:-2] , 'count' : 0}]}
 
     def stmt_continue_stmt(self,args):
-        args[0]['continue'] = [{'name' : args[0]['code'][1:-2] , 'count' : 0}]
-        return args[0]
+        return {'code' : args[0]['code'], 'continue': [{'name' : args[0]['code'][1:-2] , 'count' : 0}]}
 
 
 
@@ -630,7 +627,6 @@ class Cgen(Transformer):
     def constant_double2(self, args):
         parts = re.split(r"[Ee]", args[0])
         value = float(parts[0]) * (10 ** int(parts[1]))
-        print(value)
         code = "# Double Constant : " + str(value) + "\n"
         code += "li.s $f0, " + str(value) + "\n"
         code += "s.s $f0, 0($sp)\n"
@@ -671,7 +667,6 @@ class Cgen(Transformer):
 
     def func_decl(self, args):
         returnType = args[0]
-        print("kiiiririri")
         functionName = args[1].children[0]
         formals = args[2]
         stmt_block = args[3]
@@ -685,8 +680,7 @@ class Cgen(Transformer):
         return {'code': code, 'name': functionName}
 
     def stmt_print_stmt(self, args):
-        args[0]['break_labels'] = []
-        return args[0]
+        return {'code': args[0]['code'], 'break_labels': []}
 
     def print_stmt(self, args):
         code = ''
@@ -721,7 +715,6 @@ class Cgen(Transformer):
         return {'code': code}
 
     def decl_function_decl(self, args):
-        # print(args[0] , "decl_func")
         return args[0]
 
     def program(self, args):

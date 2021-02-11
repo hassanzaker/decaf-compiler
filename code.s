@@ -172,22 +172,48 @@ addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5
 # Begin of Statement Block
 addi $sp , $sp , -0 # Allocate From Stack For Block Statement Variables
 addi $fp , $sp , 4
-# Bool Constant : false
-li $t0, 0
+# Initialization Expression of Loop for
+label0: # Starting for Loop Body
+# Calculating For Loop Condition
+# Int Constant : 4
+li $t0 , 4
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# Int Constant : 5
+li $t0 , 5
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# less than Expression
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+slt $t0 , $t0 , $t1
+sw $t0 , 8($sp)
+addi $sp , $sp , 4
+# Loading For Loop Condition Result
+addi $sp , $sp , 4
+lw $t0 , 0($sp)
+beqz $t0 , label1 # Jumping to end label if Condition Expression of for loop is false
+# Begin of Statement Block
+addi $sp , $sp , -0 # Allocate From Stack For Block Statement Variables
+addi $fp , $sp , 4
+# Int Constant : 3
+li $t0 , 3
 sw $t0 , 0($sp)
 addi $sp, $sp, -4
 # Print expr : 
 addi $sp , $sp , 4 # Pop Expression of Print
 lw $a0 , 0($sp)
-la $t0 , str_bool
-sll $a0 , $a0 , 2
-add $a0 , $a0 , $t0
-lw $a0 , 0($a0)
-li $v0 , 4
+li $v0 , 1
 syscall
 li $v0 , 4
 la $a0 , new_line
 syscall
+addi $sp , $sp , 0 # UnAllocate Stack Area (Removing Block Statement Variables)
+addi $fp ,$sp , 4
+# End of Statement Block
+# Step Expression of For loop 
+j label1 # Jumping to beggining of while loop
+label1:
 addi $sp , $sp , 0 # UnAllocate Stack Area (Removing Block Statement Variables)
 addi $fp ,$sp , 4
 # End of Statement Block
