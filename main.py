@@ -4,15 +4,14 @@ from CGen import *
 
 text = """
 int main() {
-    for(;4 < 5;){
-    print(3);
-    }
+    int a;
+    a = "str";    
 }
 """
 tree = parse_text(text)
 print(tree)
 a = MyTransformer()
 a.transform(tree)
-b = Cgen().transform(tree)
+b = Cgen(a.classes, a.symbol_table).transform(tree)
 print(b)
 

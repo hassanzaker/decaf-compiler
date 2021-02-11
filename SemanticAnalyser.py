@@ -1,11 +1,13 @@
-from lark import Lark, Transformer
+from lark import Lark, Transformer, Tree
 from ClassTable import Classes, Class
-import re
+from symbol_table import Symbol, Symbol_Table
 
 arr=[]
 class MyTransformer(Transformer):
     def __init__(self):
+        self.scope = 0
         self.classes = Classes()
+        self.symbol_table = Symbol_Table()
 
     def INT(self, token):
         return 'int'
@@ -22,8 +24,23 @@ class MyTransformer(Transformer):
         if len(value) == 0:
             return 'null'
         return value
-    def stmt_block(self,token):
-        return token
+
+    def stmt_block(self, args):
+        self.scope += 1
+        for arg in args:
+            if (not isinstance(arg, Tree)) and 'name' in arg and 'type' in arg:
+                self.symbol_table.addVariable(Symbol(self.scope, arg['name'], arg['type']))
+        return args
+
+    def stmt_stmt_block(self, args):
+        return args
+
+    def formals(self, args):
+        return args
+
+    def formals_empty(self, args):
+        return args
+
 
 ####################### Type  ###########################
     def type_int(self, args):
@@ -91,7 +108,11 @@ class MyTransformer(Transformer):
         return {'field': 'method', "access_level": args[0], 'name': args[1]['name'], 'type': args[1]['type']}
 
     def func_decl(self, args):
+        for arg in args[2]:
+            if (not isinstance(arg, Tree)) and 'name' in arg and 'type' in arg:
+                self.symbol_table.addVariable(Symbol(self.scope, arg['name'], arg['type']))
         return {'type': args[0], 'name': args[1].children[0].value}
+
 
     def func_decl_data_type(self, args):
         return {'type': args[0].value, 'name': args[1].children[0].value}
@@ -102,11 +123,17 @@ class MyTransformer(Transformer):
     def variable_decl(self, args):
         return args[0]
 
+    def global_variable(self, args):
+        for arg in args:
+            if 'name' in arg and 'type' in arg:
+                self.symbol_table.addVariable(Symbol(10000, arg['name'], arg['type'])) # 10000 is for global variables
+        return args
+
     def variable_type_primitive(self, args):
         return {'type': args[0], 'name': args[1].children[0][0]}
 
     def variable_type_class(self, args):
-        return {'type': args[0].value , 'name': args[1].children[0][0]}
+        return {'type': args[0].value, 'name': args[1].children[0][0]}
 
     def public_access(self, args):
         return "public"

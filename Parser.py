@@ -7,7 +7,7 @@ import pprint
 def create_parser():
     parser = Lark("""
         program : (decl)+ -> program
-        decl : variable_decl 
+        decl : variable_decl -> global_variable
             | function_decl -> decl_function_decl
             | class_decl -> decl_class_decl
             | interface_decl
@@ -27,7 +27,7 @@ def create_parser():
             | ident_type ident "(" formals ")" stmt_block -> func_decl_data_type
             | "void" ident "(" formals ")" stmt_block -> function_void_decl
             
-        formals : variable ("," variable)* 
+        formals : variable ("," variable)* -> formals
             |  -> formals_empty
             
         class_decl : "class" ident class_extend  class_implement class_fields -> class_decl
@@ -61,7 +61,7 @@ def create_parser():
         print_stmt : "print" "(" expr (","expr)* ")" ";" -> print_stmt
         expr : l_value "=" expr -> expr_assign
             | constant -> expr_constant
-            | l_value 
+            | l_value -> lvalue
             | "this" 
             | call 
             | "(" expr ")" -> exp_inside_parenthesis
@@ -89,7 +89,8 @@ def create_parser():
             | "itob" "(" expr ")" 
             | "btoi" "(" expr ")"
             
-        l_value : ident | expr "." ident | expr "[" expr "]"
+        l_value : ident -> lvalue_id
+            | expr "." ident | expr "[" expr "]"
         call : ident "(" actuals ")" | expr "." ident "(" actuals ")"
         actuals : expr ("," expr)* | 
         

@@ -5,12 +5,10 @@ from lark import Lark, Transformer
 
 
 class Cgen(Transformer):
-    # def __init__(self, classes):
-    #     self.classes = classes
-    #     self.data_code = ''
-    #     self.string_numbers = 0
-    #     self.label_number = 0
-    def __init__(self):
+    def __init__(self, classes, symbol_table):
+        self.scope = 0
+        self.classes = classes
+        self.symbol_table = symbol_table
         self.data_code = ''
         self.string_numbers = 0
         self.label_number = 0
@@ -19,7 +17,7 @@ class Cgen(Transformer):
 
     def log_code(self, code):
         dirname = os.path.dirname(__file__)
-        file = open(dirname + "/code.s", "w")
+        file = open(dirname + "/result.s", "w")
         file.write(code)
         file.close()
 
@@ -408,9 +406,42 @@ class Cgen(Transformer):
     def formals_empty(self, args):
         return {'variable_count': 0}
 
+    def variable_type_primitive(self, args):
+        return {'type': args[0], 'name': args[1].children[0][0]}
+
+    def variable_type_class(self, args):
+        return {'type': args[0].value, 'name': args[1].children[0][0]}
+
+
+    def variable_decl(self, args):
+        return {"variable_count": 1}
+
+    def global_variable(self, args):
+        return {'code': ''}
+
+    def lvalue_id(self, args):
+        name = args[0].children[0].value
+        var, address = self.symbol_table.getVariable(name, self.scope)
+        code = "# Loading Address of ID : " + var.name + "\n"
+        code += "addi $s7 , $fp , " + str(address) + "\n"
+        code += 'sw $s7, 0($sp)' + ' # Push Address of ' + str(address) + ' to Stack\n'
+        code += 'addi $sp, $sp, -4\n'
+        return {'code': code,
+                'name': var.name,
+                'value_type': var.type}
+
+    def lvalue(self, args):
+        code = "# loading address of lvalue\n"
+        code += "lw $t0, 4($sp)\n"
+        code += "lw $t0 , 0($t0)\n"
+        code += "sw $t0 , 4($sp)\n"
+        args[0]['code'] += code
+        return args[0]
+
+
     def expr_assign(self, args):
         if args[0]['value_type'] != args[1]['value_type']:
-            raise Exception("Types of Right Hand Side of Assign is not the same as Left Side")
+            raise Exception("can not assign " + args[1]['value_type'] + " to " + args[0]['value_type'] + "!")
         value_type = args[0]['value_type']
         code = "# Left Hand Side Assign\n"
         code += args[0]['code']
@@ -438,11 +469,12 @@ class Cgen(Transformer):
             code = args[0]['code']
             code += "# End of Expression Optional\n"
             code += "addi $sp , $sp 4\n"
-            return {'code': code}
+            return {'code': code, "break_labels": []}
         else:
-            return {'code': ''}
+            return {'code': '', "break_labels": []}
 
     def stmt_block(self, args):
+        self.scope += 1
         variable_count = 0
         stmts = []
         for arg in args:
@@ -463,6 +495,7 @@ class Cgen(Transformer):
             variable_count * 4) + " # UnAllocate Stack Area (Removing Block Statement Variables)\n"
         code += "addi $fp ,$sp , 4\n"
         code += "# End of Statement Block\n"
+        self.symbol_table.removeFromScop(self.scope)
         return {'code': code, 'break_labels': break_labels}
 
     def if_stmt(self, args):
@@ -485,7 +518,7 @@ class Cgen(Transformer):
             code += second_label + " :\n"
         else:
             raise Exception("condition should be bool type!")
-        return {'code': code}
+        return {'code': code, 'break_labels': args[1]['break_labels']}
 
 
     def stmt_stmt_block(self, args):
@@ -493,7 +526,7 @@ class Cgen(Transformer):
 
     def stmt_if_stmt(self, args):
         code = "#End of if statement\n"
-        return {'code': args[0]['code'] + code}
+        return {'code': args[0]['code'] + code, 'break_labels': args[0]['break_labels']}
 
     def find_break_label(self , arr , name):
         for item in arr:
@@ -508,7 +541,6 @@ class Cgen(Transformer):
         self.string_numbers += 1
         second_label = "label" + str(self.string_numbers)
         self.string_numbers += 1
-        print(stmt)
         break_labels = stmt['break_labels']
         pattern = re.compile(r'@(break\d+)@')
         for break_label in re.findall(pattern, stmt['code']):
@@ -728,6 +760,7 @@ class Cgen(Transformer):
         code += "\n"
         for arg in args:
             code += arg['code']
+        self.data_code += self.symbol_table.getData()
         self.data_code += "str_false : .asciiz \"false\" \n"
         self.data_code += "str_true : .asciiz \"true\" \n"
         self.data_code += "new_line : .asciiz \"\n\" \n"

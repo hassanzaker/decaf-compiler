@@ -170,12 +170,34 @@ main: # Start function
 addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5
 # Function Body :
 # Begin of Statement Block
-addi $sp , $sp , -0 # Allocate From Stack For Block Statement Variables
+addi $sp , $sp , -4 # Allocate From Stack For Block Statement Variables
 addi $fp , $sp , 4
+# Left Hand Side Assign
+# Loading Address of ID : a
+addi $s7 , $fp , 0
+sw $s7, 0($sp) # Push Address of 0 to Stack
+addi $sp, $sp, -4
+# Right Hand Side Assign
 # Int Constant : 4
 li $t0 , 4
 sw $t0 , 0($sp)
 addi $sp, $sp, -4
+# Assign Right Side to Left
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+sw $t1 , 0($t0)
+sw $t1 , 8($sp)
+addi $sp , $sp , 4
+# End of Expression Optional
+addi $sp , $sp 4
+# Loading Address of ID : a
+addi $s7 , $fp , 0
+sw $s7, 0($sp) # Push Address of 0 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
 # Print expr : 
 addi $sp , $sp , 4 # Pop Expression of Print
 lw $a0 , 0($sp)
@@ -184,7 +206,63 @@ syscall
 li $v0 , 4
 la $a0 , new_line
 syscall
-addi $sp , $sp , 0 # UnAllocate Stack Area (Removing Block Statement Variables)
+# Begin of Statement Block
+addi $sp , $sp , -4 # Allocate From Stack For Block Statement Variables
+addi $fp , $sp , 4
+# Left Hand Side Assign
+# Loading Address of ID : a
+addi $s7 , $fp , 0
+sw $s7, 0($sp) # Push Address of 0 to Stack
+addi $sp, $sp, -4
+# Right Hand Side Assign
+# Int Constant : 6
+li $t0 , 6
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# Assign Right Side to Left
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+sw $t1 , 0($t0)
+sw $t1 , 8($sp)
+addi $sp , $sp , 4
+# End of Expression Optional
+addi $sp , $sp 4
+# Loading Address of ID : a
+addi $s7 , $fp , 0
+sw $s7, 0($sp) # Push Address of 0 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Print expr : 
+addi $sp , $sp , 4 # Pop Expression of Print
+lw $a0 , 0($sp)
+li $v0 , 1
+syscall
+li $v0 , 4
+la $a0 , new_line
+syscall
+addi $sp , $sp , 4 # UnAllocate Stack Area (Removing Block Statement Variables)
+addi $fp ,$sp , 4
+# End of Statement Block
+# Loading Address of ID : a
+addi $s7 , $fp , 0
+sw $s7, 0($sp) # Push Address of 0 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Print expr : 
+addi $sp , $sp , 4 # Pop Expression of Print
+lw $a0 , 0($sp)
+li $v0 , 1
+syscall
+li $v0 , 4
+la $a0 , new_line
+syscall
+addi $sp , $sp , 4 # UnAllocate Stack Area (Removing Block Statement Variables)
 addi $fp ,$sp , 4
 # End of Statement Block
 main_end:
@@ -193,6 +271,7 @@ jr $ra
 
 
 .data
+a10000 : .word 0
 str_false : .asciiz "false" 
 str_true : .asciiz "true" 
 new_line : .asciiz "
