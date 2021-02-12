@@ -40,6 +40,12 @@ class Symbol_Table:
                 self.variables.remove(var)
 
 
+    def getFunction(self, name):
+        for func in self.functions:
+            if func.name == name:
+                return func
+        raise Exception('function does not exist!')
+
     def getVariable(self, name, scope):
         counter = 0
         for var in self.variables:
@@ -57,7 +63,7 @@ class Symbol_Table:
                 return (var, counter * 4)
             counter += 1
         else:
-            raise Exception('variable not defined!')
+            raise Exception('variable ' + name + ' not defined!')
 
 
     def getData(self):

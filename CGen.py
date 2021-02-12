@@ -15,6 +15,7 @@ class Cgen(Transformer):
         self.break_labels = 0
         self.continue_labels = 0
         self.builtin_functions = []
+        self.stack = []
 
     def log_code(self, code):
         dirname = os.path.dirname(__file__)
@@ -129,7 +130,7 @@ class Cgen(Transformer):
             code += "div $t0 , $t1\n"
             code += "mfhi $t0\n"
             code += "sw $t0 , 8($sp)\n"
-        elif value_type1 == 'double' and value_type2 == value_type1:  #TODO this is wrong
+        elif value_type1 == 'double' and value_type2 == value_type1:  # TODO this is wrong
             code += "l.s $f0 , 8($sp)\n"
             code += "l.s $f1 , 4($sp)\n"
             code += "div.s $f0 , $f0 , $f1\n"
@@ -488,6 +489,14 @@ class Cgen(Transformer):
     def type_id(self, args):
         return args[0].children[0]
 
+    def formals(self, args):
+        counter = 0
+        for arg in args:
+            counter += 1
+            var = self.symbol_table.getVariable(arg['name'], self.scope)
+            self.stack.append(var)
+        return {'variable_count': counter}
+
     def formals_empty(self, args):
         return {'variable_count': 0}
 
@@ -496,7 +505,6 @@ class Cgen(Transformer):
 
     def variable_type_class(self, args):
         return {'type': args[0].value, 'name': args[1].children[0]}
-
 
     def variable_decl(self, args):
         return {"variable_count": 1}
@@ -557,8 +565,8 @@ class Cgen(Transformer):
         args[0]['code'] += code
         return args[0]
 
-
     def expr_assign(self, args):
+        print(args[1])
         if args[0]['value_type'] != args[1]['value_type']:
             raise Exception("can not assign " + args[1]['value_type'] + " to " + args[0]['value_type'] + "!")
         value_type = args[0]['value_type']
@@ -579,6 +587,9 @@ class Cgen(Transformer):
         code += "addi $sp , $sp , 4\n"
         return {'code': code,
                 'value_type': value_type}
+
+    def call_expr(self, args):
+        return args[0]
 
     def new_ident_exp(self, args):
         id = args[0].children[0]
@@ -621,6 +632,44 @@ class Cgen(Transformer):
         code += "sw $v0, 4($sp)\n"
         return {'code': code,
                 'value_type': args[1] + "[]"}
+
+    def call_exp(self, args):
+        return args[0]
+
+    def call_global_func(self, args):
+        id = args[0].children[0]
+        value_type = self.symbol_table.getFunction(id).type
+        actuals = args[1]
+        code = "# Storing Frame Pointer and Return Address Before Calling the function : " + id + "\n"
+        code += "addi $sp , $sp , -12\n"
+        code += "sw $fp , 4($sp)\n"
+        code += "sw $ra , 8($sp)\n"
+        code += "sw $s5 , 12($sp)\n"
+        code += "# Function Arguments\n"
+        code += actuals['code']
+        code += "jal " + str(id) + " # Calling Function\n"
+        code += "# Pop Arguments of function\n"
+        code += "addi $sp , $sp , " + str(actuals['variable_count'] * 4) + "\n"
+        code += "# Load Back Frame Pointer and Return Address After Function call\n"
+        code += "lw $fp , 4($sp)\n"
+        code += "lw $ra , 8($sp)\n"
+        code += "lw $s5 , 12($sp)\n"
+        code += "addi $sp , $sp , 8\n"
+        if value_type == 'double':
+            code += "s.s $f0 , 4($sp) # Push Return Value from function to Stack\n"
+        else:
+            code += "sw $v0 , 4($sp) # Push Return Value from function to Stack\n"
+        return {'code': code, 'value_type': value_type}
+
+    def actuals(self, args):
+        expr1 = args[0]
+        if len(args) > 1:
+            expr2 = args[1]
+            return {'variable_count': len(args), 'code': expr1['code'] + expr2['code']}
+        return {'variable_count': len(args), 'code': expr1['code']}
+
+    def actual_empty(self, args):
+        return {'variable_count': 0, 'code': ''}
 
     def read_integer_exp(self, args):
         self.builtin_functions.append("readInteger")
@@ -724,10 +773,13 @@ class Cgen(Transformer):
         self.scope += 1
         variable_count = 0
         stmts = []
+        return_types = []
         for arg in args:
             if 'variable_count' in arg:
                 variable_count += arg['variable_count']
             else:
+                if 'return_type' in arg:
+                    return_types.append(arg['return_type'])
                 stmts.append(arg)
 
         break_labels = []
@@ -743,7 +795,8 @@ class Cgen(Transformer):
         code += "addi $fp ,$sp , 4\n"
         code += "# End of Statement Block\n"
         self.symbol_table.removeFromScop(self.scope)
-        return {'code': code, 'break_labels': break_labels}
+        return_types = list(set(return_types))
+        return {'code': code, 'break_labels': break_labels, 'return_type': return_types}
 
     def if_stmt(self, args):
         exp = args[0]
@@ -767,7 +820,6 @@ class Cgen(Transformer):
             raise Exception("condition should be bool type!")
         return {'code': code, 'break_labels': args[1]['break_labels']}
 
-
     def stmt_stmt_block(self, args):
         return args[0]
 
@@ -775,7 +827,7 @@ class Cgen(Transformer):
         code = "#End of if statement\n"
         return {'code': args[0]['code'] + code, 'break_labels': args[0]['break_labels']}
 
-    def find_break_label(self , arr , name):
+    def find_break_label(self, arr, name):
         for item in arr:
             if item['name'] == name:
                 return item['count']
@@ -791,11 +843,11 @@ class Cgen(Transformer):
         break_labels = stmt['break_labels']
         pattern = re.compile(r'@(break\d+)@')
         for break_label in re.findall(pattern, stmt['code']):
-            count = self.find_break_label(break_labels , break_label)
+            count = self.find_break_label(break_labels, break_label)
             code_for_break = "addi $sp , $sp , " + str(count * 4) + " # Pop elements before\n"
             code_for_break += "addi $fp , $sp , 4 # Set Frame Pointer\n"
             code_for_break += "j " + second_label + " # Break from loop while\n"
-            stmt['code'] = stmt['code'].replace("@" + break_label + "@" , code_for_break)
+            stmt['code'] = stmt['code'].replace("@" + break_label + "@", code_for_break)
 
         if exp["value_type"] == "bool":
             code = first_label + ": # Starting While Loop Body\n"
@@ -810,11 +862,11 @@ class Cgen(Transformer):
             code += second_label + ":\n"
         else:
             raise Exception("condition should be bool type!")
-        return {'code' : code , 'break_labels': []}
+        return {'code': code, 'break_labels': []}
 
     def stmt_while_stmt(self, args):
         code = "#End of while statement\n"
-        return  {'code': args[0]['code'] + code, 'break_labels': args[0]['break_labels']}
+        return {'code': args[0]['code'] + code, 'break_labels': args[0]['break_labels']}
 
     def for_stmt(self, args):
         number_of_elem = len(args)
@@ -843,7 +895,7 @@ class Cgen(Transformer):
             else:
                 pass
         code = "# Initialization Expression of Loop for\n"
-        code += ''  #should add initialize term
+        code += ''  # should add initialize term
         # if expr_initialization['code'] != '':
         #     code += "addi $sp , $sp , 4 # pop init expr of loop for\n"
         code += first_label + ": # Starting for Loop Body\n"
@@ -855,34 +907,56 @@ class Cgen(Transformer):
         code += "beqz $t0 , " + second_label + " # Jumping to end label if Condition Expression of for loop is false\n"
         code += stmt['code']
         code += "# Step Expression of For loop \n"
-        code += '' #should add step
+        code += ''  # should add step
         # if expr_step['code'] != '':
         #     code += "addi $sp , $sp , 4 # pop step expr of loop for\n"
         code += "j " + second_label + " # Jumping to beggining of while loop\n"
         code += second_label + ":\n"
-        return {'code' : code , 'break_labels' : []}
+        return {'code': code, 'break_labels': []}
 
     def stmt_for_stmt(self, args):
         return args[0]
 
-    def break_stmt(self,args):
+    def break_stmt(self, args):
         code = "@" + "break" + str(self.break_labels) + "@\n"
         self.break_labels += 1
-        return {'code' : code}
+        return {'code': code}
 
     def continue_stmt(self, args):
         code = "@" + "continue" + str(self.continue_labels) + "@\n"
         self.continue_labels += 1
-        return {'code' : code}
+        return {'code': code}
 
-    def stmt_break_stmt(self , args):
-        return {'code' : args[0]['code'], 'break_labels': [{'name' : args[0]['code'][1:-2] , 'count' : 0}]}
+    def stmt_break_stmt(self, args):
+        return {'code': args[0]['code'], 'break_labels': [{'name': args[0]['code'][1:-2], 'count': 0}]}
 
-    def stmt_continue_stmt(self,args):
-        return {'code' : args[0]['code'], 'continue': [{'name' : args[0]['code'][1:-2] , 'count' : 0}]}
+    def stmt_continue_stmt(self, args):
+        return {'code': args[0]['code'], 'continue': [{'name': args[0]['code'][1:-2], 'count': 0}]}
 
+    def stmt_return_stmt(self, args):
+        args[0]['break_labels'] = []
+        args[0]['return_type'] = args[0]['return_type']
+        return args[0]
 
+    def return_stmt(self, args):
+        if len(args) > 0:
+            expr = args[0]
+            code = ''
 
+            if expr['code'] != '':
+                code = expr['code']
+                if expr['value_type'] == 'double':
+                    code += 'l.s $f0 , 4($sp) # Loading Return Value of function\n'
+                else:
+                    code += 'lw $v0 , 4($sp) # Loading Return Value of function\n'
+                code += "addi $sp , $sp , 4\n"
+            code += "move $sp , $s5\n"
+            code += "jr $ra # Return Function\n"
+            return {'code': code, 'return_type': expr['value_type']}
+        else:
+            code = "move $sp , $s5\n"
+            code += "jr $ra # Return Function\n"
+            return {'code': code, 'return_type': 'void'}
 
     def constant_int(self, args):
         val = int(args[0].value, 0)
@@ -949,6 +1023,28 @@ class Cgen(Transformer):
         functionName = args[1].children[0]
         formals = args[2]
         stmt_block = args[3]
+        for type in stmt_block['return_type']:
+            if type != returnType:
+                raise Exception('this function can not return a ' + type + "!")
+        label_end = functionName + "_end"
+        code = functionName + ": # Start function\n"
+        code += "addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5\n"
+        code += "# Function Body :\n"
+        code += stmt_block['code']
+        code += 'lw $v0, 0($sp)\n'
+        code += label_end + ":\n"
+        code += "jr $ra\n\n"
+        # self.stack.pop(formals['variable_count'])
+        return {'code': code, 'name': functionName, 'value_type': returnType}
+
+    def func_decl_data_type(self, args):
+        returnType = args[0]
+        functionName = args[1].children[0]
+        formals = args[2]
+        stmt_block = args[3]
+        for type in stmt_block['return_type']:
+            if type != returnType:
+                raise Exception('this function can not return an object of  ' + type + "!")
         label_end = functionName + "_end"
         code = functionName + ": # Start function\n"
         code += "addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5\n"
@@ -956,7 +1052,26 @@ class Cgen(Transformer):
         code += stmt_block['code']
         code += label_end + ":\n"
         code += "jr $ra\n\n"
-        return {'code': code, 'name': functionName}
+        # self.stack.pop(formals['variable_count'])
+        return {'code': code, 'name': functionName, 'value_type': returnType}
+
+    def function_void_decl(self, args):
+        returnType = 'void'
+        functionName = args[0].children[0]
+        formals = args[1]
+        stmt_block = args[2]
+        for type in stmt_block['return_type']:
+            if type != returnType:
+                raise Exception('this function can not return a ' + type + "!")
+        label_end = functionName + "_end"
+        code = functionName + ": # Start function\n"
+        code += "addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5\n"
+        code += "# Function Body :\n"
+        code += stmt_block['code']
+        code += label_end + ":\n"
+        code += "jr $ra\n\n"
+        # self.stack.pop(formals['variable_count'])
+        return {'code': code, 'name': functionName, 'value_type': 'void'}
 
     def stmt_print_stmt(self, args):
         return {'code': args[0]['code'], 'break_labels': []}
@@ -1004,6 +1119,7 @@ class Cgen(Transformer):
     #
     def class_decl(self, args):
         return {'code': ''}
+
     # def class_decl_fields(self, args):
     #
     # def class_decl_extend(self, args):

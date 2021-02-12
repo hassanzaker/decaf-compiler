@@ -49,13 +49,13 @@ def create_parser():
             | for_stmt -> stmt_for_stmt
             | break_stmt -> stmt_break_stmt
             | continue_stmt -> stmt_continue_stmt
-            | return_stmt 
+            | return_stmt -> stmt_return_stmt
             | print_stmt -> stmt_print_stmt
             | stmt_block -> stmt_stmt_block
         if_stmt : "if" "(" expr ")" stmt ("else" stmt)? -> if_stmt
         while_stmt : "while" "(" expr ")" stmt -> while_stmt
         for_stmt: "for" "(" (expr)? ";" expr ";" (expr)? ")" stmt ->for_stmt
-        return_stmt : "return" (expr)? ";"
+        return_stmt : "return" (expr)? ";" -> return_stmt
         break_stmt : "break" ";" -> break_stmt
         continue_stmt : "continue;" ->continue_stmt
         print_stmt : "print" "(" expr (","expr)* ")" ";" -> print_stmt
@@ -63,7 +63,7 @@ def create_parser():
             | constant -> expr_constant
             | l_value -> lvalue
             | "this"  -> this_exp
-            | call 
+            | call -> call_expr
             | "(" expr ")" -> exp_inside_parenthesis
             | expr "+" expr -> exp_plus_exp
             | expr "-" expr -> exp_minus_exp
@@ -92,8 +92,10 @@ def create_parser():
         l_value : ident -> lvalue_id
             | expr "." ident -> get_class_variable
             | expr "[" expr "]" -> get_array_item
-        call : ident "(" actuals ")" | expr "." ident "(" actuals ")"
-        actuals : expr ("," expr)* | 
+        call : ident "(" actuals ")" -> call_global_func
+            | expr "." ident "(" actuals ")"
+        actuals : expr ("," expr)* -> actuals
+            | -> actual_empty
         
         constant : INT -> constant_int
             | DOUBLE -> constant_double

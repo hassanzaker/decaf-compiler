@@ -3,15 +3,18 @@ from SemanticAnalyser import *
 from CGen import *
 
 text = """
+void f(ali a){
+a.x = 4;
+}
 class ali{
 int x;
 }
 int main() {
-    string a;
-    string b;
-    a = "ali";
-    b = " zaker";
-    print(a + b);
+    ali a;
+    a = new ali;
+    f(a);
+    print(a.x);
+    
 }
 """
 tree = parse_text(text)
