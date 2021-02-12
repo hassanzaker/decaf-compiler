@@ -566,7 +566,6 @@ class Cgen(Transformer):
         return args[0]
 
     def expr_assign(self, args):
-        print(args[1])
         if args[0]['value_type'] != args[1]['value_type']:
             raise Exception("can not assign " + args[1]['value_type'] + " to " + args[0]['value_type'] + "!")
         value_type = args[0]['value_type']
@@ -638,10 +637,16 @@ class Cgen(Transformer):
 
     def call_global_func(self, args):
         id = args[0].children[0]
-        value_type = self.symbol_table.getFunction(id).type
+        func = self.symbol_table.getFunction(id)
+        value_type = func.type
         actuals = args[1]
-        print("ss")
-        print(actuals)
+        if (len(actuals['actual_types']) != len(func.formals)):
+            raise Exception('"function ' + str(id) + " has " + str(len(func.formals)) + " arguments!")
+        size = len(func.formals)
+        actual_types = actuals['actual_types']
+        for i in range(size):
+            if actual_types[i] != func.formals[i]:
+                raise Exception('type for calling function is not true!')
         code = "# Storing Frame Pointer and Return Address Before Calling the function : " + id + "\n"
         code += "addi $sp , $sp , -12\n"
         code += "sw $fp , 4($sp)\n"
@@ -665,14 +670,16 @@ class Cgen(Transformer):
 
     def actuals(self, args):
         code = ''
+        value_types = []
         args = list(args)
         args.reverse()
         for arg in args:
             code += arg['code']
-        return {'variable_count': len(args), 'code': code}
+            value_types.append(arg['value_type'])
+        return {'variable_count': len(args), 'code': code, 'actual_types': value_types}
 
     def actual_empty(self, args):
-        return {'variable_count': 0, 'code': ''}
+        return {'variable_count': 0, 'code': '', 'actual_types': []}
 
     def read_integer_exp(self, args):
         self.builtin_functions.append("readInteger")
@@ -1062,7 +1069,6 @@ class Cgen(Transformer):
         returnType = 'void'
         functionName = args[0].children[0]
         formals = args[1]
-        print(formals)
         stmt_block = args[2]
         for type in stmt_block['return_type']:
             if type != returnType:

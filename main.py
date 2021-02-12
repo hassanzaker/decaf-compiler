@@ -3,17 +3,25 @@ from SemanticAnalyser import *
 from CGen import *
 
 text = """
-void f(ali a, int b, int c){
-a.x = b * c;
+int f(int a){
+if (a == 0)
+    return 1;
+else
+    return a * f(a - 1);
+}
+int h(int a){
+if (a == 0)
+    return 0;
+else
+    return a * f(a - 1);
 }
 class ali{
 int x;
+int a;
+int b;
 }
 int main() {
-    ali a;
-    a = new ali;
-    f(a, 9, 3);
-    print(a.x);
+    print(f(10));
     
 }
 """

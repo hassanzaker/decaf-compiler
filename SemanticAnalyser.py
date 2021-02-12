@@ -1,6 +1,6 @@
 from lark import Lark, Transformer, Tree
 from ClassTable import Classes, Class
-from symbol_table import Symbol, Symbol_Table
+from symbol_table import Symbol, Symbol_Table, Function
 
 arr=[]
 class MyTransformer(Transformer):
@@ -108,25 +108,34 @@ class MyTransformer(Transformer):
         return {'field': 'method', "access_level": args[0], 'name': args[1]['name'], 'type': args[1]['type']}
 
     def func_decl(self, args):
-        self.symbol_table.addFunction(Symbol(self.scope, args[1].children[0].value, args[0]))
+        self.scope += 1
+        formals = []
         for arg in args[2]:
             if (not isinstance(arg, Tree)) and 'name' in arg and 'type' in arg:
                 self.symbol_table.addVariable(Symbol(self.scope, arg['name'], arg['type']))
+                formals.append(arg['type'])
+        self.symbol_table.addFunction(Function(self.scope, args[1].children[0].value, args[0], formals))
         return {'type': args[0], 'name': args[1].children[0].value}
 
 
     def func_decl_data_type(self, args):
-        self.symbol_table.addFunction(Symbol(self.scope, args[1].children[0].value, args[0]))
+        self.scope += 1
+        formals = []
         for arg in args[2]:
             if (not isinstance(arg, Tree)) and 'name' in arg and 'type' in arg:
                 self.symbol_table.addVariable(Symbol(self.scope, arg['name'], arg['type']))
+                formals.append(arg['type'])
+        self.symbol_table.addFunction(Function(self.scope, args[1].children[0].value, args[0], formals))
         return {'type': args[0].value, 'name': args[1].children[0].value}
 
     def function_void_decl(self, args):
-        self.symbol_table.addFunction(Symbol(self.scope, args[0].children[0].value, 'void'))
+        self.scope += 1
+        formals = []
         for arg in args[1]:
             if (not isinstance(arg, Tree)) and 'name' in arg and 'type' in arg:
                 self.symbol_table.addVariable(Symbol(self.scope, arg['name'], arg['type']))
+                formals.append(arg['type'])
+        self.symbol_table.addFunction(Function(self.scope, args[0].children[0].value, args[0], formals))
         return {'type': 'void', 'name': args[0].children[0].value}
 
     def variable_decl(self, args):
