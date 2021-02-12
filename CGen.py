@@ -287,6 +287,18 @@ class Cgen(Transformer):
             code += "li $t0 , 1\n"
             code += second_label + ":\n"
             code += "sw $t0 , 8($sp)\n"
+        elif value_type1 == "string" and value_type2 == value_type1:
+            self.builtin_functions.append('stringEquality')
+            code += "lw $a0 , 8($sp)\n"
+            code += "lw $a1 , 4($sp)\n"
+            code += "addi $sp , $sp , -8\n"
+            code += "sw $fp , 8($sp)\n"
+            code += "sw $ra , 4($sp)\n"
+            code += "jal StringsEquality # Calling Function to Check Equality of two Strings\n"
+            code += "lw $fp , 8($sp)\n"
+            code += "lw $ra , 4($sp)\n"
+            code += "addi $sp , $sp , 8\n"
+            code += "sw $v0 , 8($sp) # Saving Result of Equality of two Strings\n"
         else:
             raise Exception("Can Not compare " + value_type1 + " with " + value_type2 + "!")
         code += "addi $sp , $sp , 4\n"
@@ -322,6 +334,19 @@ class Cgen(Transformer):
             code += "li $t0 , 0\n"
             code += second_label + ":\n"
             code += "sw $t0 , 8($sp)\n"
+        elif value_type1 == "string" and value_type2 == value_type1:
+            self.builtin_functions.append('StringInequality')
+            self.builtin_functions.append('stringEquality')
+            code += "lw $a0 , 8($sp)\n"
+            code += "lw $a1 , 4($sp)\n"
+            code += "addi $sp , $sp , -8\n"
+            code += "sw $fp , 8($sp)\n"
+            code += "sw $ra , 4($sp)\n"
+            code += "jal StringsInequality # Calling Function to Check Inequality of two Strings\n"
+            code += "lw $fp , 8($sp)\n"
+            code += "lw $ra , 4($sp)\n"
+            code += "addi $sp , $sp , 8\n"
+            code += "sw $v0 , 8($sp) \n"
         else:
             raise Exception("Can Not compare " + value_type1 + " with " + value_type2 + "!")
         code += "addi $sp , $sp , 4\n"

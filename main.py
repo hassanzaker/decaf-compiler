@@ -7,12 +7,8 @@ class ali{
 int x;
 }
 int main() {
-    int a;
-    bool b;
-    b = true;
-    a = btoi(b);
+    double a;
     print(a);
-    print(b);
 }
 """
 tree = parse_text(text)
