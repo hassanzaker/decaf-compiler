@@ -3,6 +3,7 @@ class Symbol:
         self.scope = scope
         self.name = name
         self.type = type
+        self.size = 0
 
     def __str__(self):
         return str(self.scope) + " " + self.name + " " + self.type + "\n"
@@ -10,12 +11,22 @@ class Symbol:
 class Symbol_Table:
     def __init__(self):
         self.variables = []
+        self.functions = []
+
+    def addFunction(self, symbol):
+        self.doesFunctionExistInThisScope(symbol.name, symbol.scope)
+        self.functions.append(symbol)
 
     def addVariable(self, symbol):
         self.doesExistInThisScope(symbol.name, symbol.scope)
         self.variables.append(symbol)
 
-
+    def doesFunctionExistInThisScope(self, name, scope):
+        for func in self.functions:
+            if func.name == name and func.scope == scope:
+                raise Exception('function ' + name + ' already exists!')
+        else:
+            return
     def doesExistInThisScope(self, name, scope):
         for var in self.variables:
             if var.name == name and var.scope == scope:

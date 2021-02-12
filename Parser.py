@@ -62,7 +62,7 @@ def create_parser():
         expr : l_value "=" expr -> expr_assign
             | constant -> expr_constant
             | l_value -> lvalue
-            | "this" 
+            | "this"  -> this_exp
             | call 
             | "(" expr ")" -> exp_inside_parenthesis
             | expr "+" expr -> exp_plus_exp
@@ -81,16 +81,17 @@ def create_parser():
             | expr "||" expr -> exp_or_exp
             | "!" expr -> exp_not
             | "ReadInteger" "(" ")" 
-            |"readLine" "(" ")" 
-            | "new" ident 
-            | "NewArray" "(" expr "," type ")" 
+            | "readLine" "(" ")" 
+            | "new" ident -> new_ident_exp
+            | "NewArray" "(" expr "," type ")"  -> new_array_exp
             | "itod" "(" expr ")" 
             | "dtoi" "(" expr ")" 
             | "itob" "(" expr ")" 
             | "btoi" "(" expr ")"
             
         l_value : ident -> lvalue_id
-            | expr "." ident | expr "[" expr "]"
+            | expr "." ident -> get_class_variable
+            | expr "[" expr "]" -> get_array_item
         call : ident "(" actuals ")" | expr "." ident "(" actuals ")"
         actuals : expr ("," expr)* | 
         

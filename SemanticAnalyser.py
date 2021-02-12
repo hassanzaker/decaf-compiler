@@ -129,11 +129,12 @@ class MyTransformer(Transformer):
                 self.symbol_table.addVariable(Symbol(10000, arg['name'], arg['type'])) # 10000 is for global variables
         return args
 
+
     def variable_type_primitive(self, args):
-        return {'type': args[0], 'name': args[1].children[0][0]}
+        return {'type': args[0], 'name': args[1].children[0]}
 
     def variable_type_class(self, args):
-        return {'type': args[0].value, 'name': args[1].children[0][0]}
+        return {'type': args[0].value, 'name': args[1].children[0]}
 
     def public_access(self, args):
         return "public"
@@ -150,5 +151,3 @@ class MyTransformer(Transformer):
     def program(self, args):
         self.classes.Inheritance()
         return
-
-

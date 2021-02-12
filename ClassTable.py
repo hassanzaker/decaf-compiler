@@ -44,7 +44,7 @@ class Class:
         for var in self.variables:
             if var['name'] == varName:
                 return var
-        raise Exception("Method ( " + varName + " ) fot found !!!")
+        raise Exception("Variable ( " + varName + " ) fot found !!!")
 
     def getMethods(self, methodName):
         for method in self.methods:
@@ -165,3 +165,16 @@ class Classes:
         else:
             return self.isChildOf(first, second)
 
+    def getConstructor(self):
+        code = ''
+        for cls in self.classes:
+            size = (len(cls.variables) + 1) * 4;
+            code += "# Constructor for Class : " + cls.name + "\n"
+            code += cls.name + "_Constructor:\n"
+            code += "li $a0 , " + str(size) + " # Size of Object ( including Vtable address at index 0 )\n"
+            code += "li $v0 , 9\n"
+            code += "syscall\n"
+            code += "la $t0 , " + cls.name + "_vtable # Loading Vtable Address of this Class\n"
+            code += "sw $t0 , 0($v0) # Storing Vtable pointer at index 0 of object\n"
+            code += "jr $ra\n\n"
+        return code

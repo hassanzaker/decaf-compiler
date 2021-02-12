@@ -382,7 +382,7 @@ class Cgen(Transformer):
     #######################################
 
     def exp_inside_parenthesis(self, args):
-        return args[0];
+        return args[0]
 
     ####################### Type  ###########################
     def type_int(self, args):
@@ -407,10 +407,10 @@ class Cgen(Transformer):
         return {'variable_count': 0}
 
     def variable_type_primitive(self, args):
-        return {'type': args[0], 'name': args[1].children[0][0]}
+        return {'type': args[0], 'name': args[1].children[0]}
 
     def variable_type_class(self, args):
-        return {'type': args[0].value, 'name': args[1].children[0][0]}
+        return {'type': args[0].value, 'name': args[1].children[0]}
 
 
     def variable_decl(self, args):
@@ -429,6 +429,40 @@ class Cgen(Transformer):
         return {'code': code,
                 'name': var.name,
                 'value_type': var.type}
+
+    def get_class_variable(self, args):
+        obj = args[0]
+        variable = args[1].children[0]
+        obj_type = obj['value_type']
+        cls = self.classes.searchClass(obj_type)
+        cls_var = cls.getVariable(variable)
+        if cls_var['access_level'] == 'public':
+            var_offset = cls.getVaribaleOffset(variable)
+        else:
+            raise Exception(str(variable) + " is not public!")
+        code = "# Loading Variable of Object\n"
+        code += obj['code']
+        code += "lw $t0 , 4($sp)\n"
+        code += "addi $t0 , $t0 , " + str(var_offset) + " # add offset of variable to object address\n"
+        code += "sw $t0 , 4($sp)\n"
+        return {'code': code, 'value_type': cls_var['type']}
+
+    def get_array_item(self, args):
+        base_arr = args[0]
+        index = args[1]
+        code = "# Get Array index\n"
+        code += "# Base Address of Array\n"
+        code += base_arr['code']
+        code += "# Expression index of Array\n"
+        code += index['code']
+        code += "lw $t0 , 8($sp) # base Address of Array\n"
+        code += "lw $t1 , 4($sp) # index of Array\n"
+        code += "addi $sp , $sp , 4\n"
+        code += "addi $t1 , $t1 , 1\n"
+        code += "sll $t1 , $t1 , 2\n"
+        code += "add $t0 , $t0 , $t1\n"
+        code += "sw $t0 , 4($sp) # Pushing address of arr[index] result to Stack\n"
+        return {'code': code, 'value_type': base_arr['value_type'][0:-2]}
 
     def lvalue(self, args):
         code = "# loading address of lvalue\n"
@@ -461,8 +495,21 @@ class Cgen(Transformer):
         return {'code': code,
                 'value_type': value_type}
 
+    def new_ident_exp(self, args):
+        id = args[0].children[0]
+        code = "# new object of type : " + id + "\n"
+        code += "sw $ra , 0($sp)\n"
+        code += "addi $sp , $sp , -4\n"
+        code += "jal " + id + "_Constructor\n"
+        code += "lw $ra , 4($sp)\n"
+        code += "sw $v0 , 4($sp) # Pushing address of object in Heap to Stack\n"
+        return {'code': code, 'value_type': id}
+
     def expr_constant(self, args):
         return args[0]
+
+    def this_exp(self, args):
+        pass
 
     def stmt_expr(self, args):
         if len(args) > 0:
@@ -472,6 +519,21 @@ class Cgen(Transformer):
             return {'code': code, "break_labels": []}
         else:
             return {'code': '', "break_labels": []}
+
+    def new_array_exp(self, args):
+        code = "# Expression of Array Size\n"
+        code += args[0]['code']
+        code += "# NewArray of Type : " + args[1] + "\n"
+        code += "lw $t0, 4($sp)\n"
+        code += "addi $t0 , $t0 , 1 # Allocate space for Storing Array Length\n"
+        code += "sll $a0 , $t0 , 2\n"
+        code += "li $v0, 9\n"
+        code += "syscall\n"
+        code += "addi $t0 , $t0 , -1 # Array Size\n"
+        code += "sw $t0 , 0($v0) # Storing Array size in index 0\n"
+        code += "sw $v0, 4($sp)\n"
+        return {'code': code,
+                'value_type': args[1] + "[]"}
 
     def stmt_block(self, args):
         self.scope += 1
@@ -749,6 +811,21 @@ class Cgen(Transformer):
     def decl_function_decl(self, args):
         return args[0]
 
+    # def method_field(self, args):
+    #     scope = "func" + str(self.scope)
+    #     args[0]['code'] = args[0]['code'].replace(args[0]['name'] + "_end:", scope + "_" + args[0]['name'] + "_end:")
+    #     args[0]['code'] = args[0]['code'].replace(args[0]['name'] + ":", scope + "_" + args[0]['name'] + ":")
+    #     return args[0]
+    #
+    def class_decl(self, args):
+        return {'code': ''}
+    # def class_decl_fields(self, args):
+    #
+    # def class_decl_extend(self, args):
+    #
+    def decl_class_decl(self, args):
+        return args[0]
+
     def program(self, args):
         dirname = os.path.dirname(__file__)
         file = open(dirname + "/default_functions.txt", "r")
@@ -758,9 +835,12 @@ class Cgen(Transformer):
         code += '.globl main\n'
         code += default_functions
         code += "\n"
+        code += self.classes.getConstructor()
         for arg in args:
+            print(arg)
             code += arg['code']
         self.data_code += self.symbol_table.getData()
+        self.data_code += self.classes.getVtables()
         self.data_code += "str_false : .asciiz \"false\" \n"
         self.data_code += "str_true : .asciiz \"true\" \n"
         self.data_code += "new_line : .asciiz \"\n\" \n"

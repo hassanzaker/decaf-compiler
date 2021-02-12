@@ -166,6 +166,15 @@ itob:
 btoi:
     lw $v0 , 4($sp)
 	jr $ra
+# Constructor for Class : ali
+ali_Constructor:
+li $a0 , 8 # Size of Object ( including Vtable address at index 0 )
+li $v0 , 9
+syscall
+la $t0 , ali_vtable # Loading Vtable Address of this Class
+sw $t0 , 0($v0) # Storing Vtable pointer at index 0 of object
+jr $ra
+
 main: # Start function
 addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5
 # Function Body :
@@ -178,10 +187,20 @@ addi $s7 , $fp , 0
 sw $s7, 0($sp) # Push Address of 0 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
-# Int Constant : 4
-li $t0 , 4
+# Expression of Array Size
+# Int Constant : 3
+li $t0 , 3
 sw $t0 , 0($sp)
 addi $sp, $sp, -4
+# NewArray of Type : int
+lw $t0, 4($sp)
+addi $t0 , $t0 , 1 # Allocate space for Storing Array Length
+sll $a0 , $t0 , 2
+li $v0, 9
+syscall
+addi $t0 , $t0 , -1 # Array Size
+sw $t0 , 0($v0) # Storing Array size in index 0
+sw $v0, 4($sp)
 # Assign Right Side to Left
 lw $t0 , 8($sp)
 lw $t1 , 4($sp)
@@ -190,33 +209,104 @@ sw $t1 , 8($sp)
 addi $sp , $sp , 4
 # End of Expression Optional
 addi $sp , $sp 4
-# Loading Address of ID : a
-addi $s7 , $fp , 0
-sw $s7, 0($sp) # Push Address of 0 to Stack
-addi $sp, $sp, -4
-# loading address of lvalue
-lw $t0, 4($sp)
-lw $t0 , 0($t0)
-sw $t0 , 4($sp)
-# Print expr : 
-addi $sp , $sp , 4 # Pop Expression of Print
-lw $a0 , 0($sp)
-li $v0 , 1
-syscall
-li $v0 , 4
-la $a0 , new_line
-syscall
-# Begin of Statement Block
-addi $sp , $sp , -4 # Allocate From Stack For Block Statement Variables
-addi $fp , $sp , 4
 # Left Hand Side Assign
+# Get Array index
+# Base Address of Array
 # Loading Address of ID : a
 addi $s7 , $fp , 0
 sw $s7, 0($sp) # Push Address of 0 to Stack
 addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Expression index of Array
+# Int Constant : 0
+li $t0 , 0
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+lw $t0 , 8($sp) # base Address of Array
+lw $t1 , 4($sp) # index of Array
+addi $sp , $sp , 4
+addi $t1 , $t1 , 1
+sll $t1 , $t1 , 2
+add $t0 , $t0 , $t1
+sw $t0 , 4($sp) # Pushing address of arr[index] result to Stack
 # Right Hand Side Assign
-# Int Constant : 6
-li $t0 , 6
+# Int Constant : 2
+li $t0 , 2
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# Assign Right Side to Left
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+sw $t1 , 0($t0)
+sw $t1 , 8($sp)
+addi $sp , $sp , 4
+# End of Expression Optional
+addi $sp , $sp 4
+# Left Hand Side Assign
+# Get Array index
+# Base Address of Array
+# Loading Address of ID : a
+addi $s7 , $fp , 0
+sw $s7, 0($sp) # Push Address of 0 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Expression index of Array
+# Int Constant : 1
+li $t0 , 1
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+lw $t0 , 8($sp) # base Address of Array
+lw $t1 , 4($sp) # index of Array
+addi $sp , $sp , 4
+addi $t1 , $t1 , 1
+sll $t1 , $t1 , 2
+add $t0 , $t0 , $t1
+sw $t0 , 4($sp) # Pushing address of arr[index] result to Stack
+# Right Hand Side Assign
+# Int Constant : 3
+li $t0 , 3
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# Assign Right Side to Left
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+sw $t1 , 0($t0)
+sw $t1 , 8($sp)
+addi $sp , $sp , 4
+# End of Expression Optional
+addi $sp , $sp 4
+# Left Hand Side Assign
+# Get Array index
+# Base Address of Array
+# Loading Address of ID : a
+addi $s7 , $fp , 0
+sw $s7, 0($sp) # Push Address of 0 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Expression index of Array
+# Int Constant : 2
+li $t0 , 2
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+lw $t0 , 8($sp) # base Address of Array
+lw $t1 , 4($sp) # index of Array
+addi $sp , $sp , 4
+addi $t1 , $t1 , 1
+sll $t1 , $t1 , 2
+add $t0 , $t0 , $t1
+sw $t0 , 4($sp) # Pushing address of arr[index] result to Stack
+# Right Hand Side Assign
+# Int Constant : 54
+li $t0 , 54
 sw $t0 , 0($sp)
 addi $sp, $sp, -4
 # Assign Right Side to Left
@@ -243,13 +333,96 @@ syscall
 li $v0 , 4
 la $a0 , new_line
 syscall
-addi $sp , $sp , 4 # UnAllocate Stack Area (Removing Block Statement Variables)
-addi $fp ,$sp , 4
-# End of Statement Block
+# Get Array index
+# Base Address of Array
 # Loading Address of ID : a
 addi $s7 , $fp , 0
 sw $s7, 0($sp) # Push Address of 0 to Stack
 addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Expression index of Array
+# Int Constant : 0
+li $t0 , 0
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+lw $t0 , 8($sp) # base Address of Array
+lw $t1 , 4($sp) # index of Array
+addi $sp , $sp , 4
+addi $t1 , $t1 , 1
+sll $t1 , $t1 , 2
+add $t0 , $t0 , $t1
+sw $t0 , 4($sp) # Pushing address of arr[index] result to Stack
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Print expr : 
+addi $sp , $sp , 4 # Pop Expression of Print
+lw $a0 , 0($sp)
+li $v0 , 1
+syscall
+li $v0 , 4
+la $a0 , new_line
+syscall
+# Get Array index
+# Base Address of Array
+# Loading Address of ID : a
+addi $s7 , $fp , 0
+sw $s7, 0($sp) # Push Address of 0 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Expression index of Array
+# Int Constant : 1
+li $t0 , 1
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+lw $t0 , 8($sp) # base Address of Array
+lw $t1 , 4($sp) # index of Array
+addi $sp , $sp , 4
+addi $t1 , $t1 , 1
+sll $t1 , $t1 , 2
+add $t0 , $t0 , $t1
+sw $t0 , 4($sp) # Pushing address of arr[index] result to Stack
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Print expr : 
+addi $sp , $sp , 4 # Pop Expression of Print
+lw $a0 , 0($sp)
+li $v0 , 1
+syscall
+li $v0 , 4
+la $a0 , new_line
+syscall
+# Get Array index
+# Base Address of Array
+# Loading Address of ID : a
+addi $s7 , $fp , 0
+sw $s7, 0($sp) # Push Address of 0 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Expression index of Array
+# Int Constant : 2
+li $t0 , 2
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+lw $t0 , 8($sp) # base Address of Array
+lw $t1 , 4($sp) # index of Array
+addi $sp , $sp , 4
+addi $t1 , $t1 , 1
+sll $t1 , $t1 , 2
+add $t0 , $t0 , $t1
+sw $t0 , 4($sp) # Pushing address of arr[index] result to Stack
 # loading address of lvalue
 lw $t0, 4($sp)
 lw $t0 , 0($t0)
@@ -271,7 +444,7 @@ jr $ra
 
 
 .data
-a10000 : .word 0
+ali_vtable:
 str_false : .asciiz "false" 
 str_true : .asciiz "true" 
 new_line : .asciiz "

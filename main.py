@@ -3,9 +3,20 @@ from SemanticAnalyser import *
 from CGen import *
 
 text = """
+class ali{
+int x;
+}
 int main() {
-    int a;
-    a = "str";    
+    int[] a;
+    a = NewArray(3, int);
+    a[0] = 2;
+    a[1] = 3;
+    a[2] = 54;
+    print(a);
+    print(a[0]);
+    print(a[1]);
+    print(a[2]);
+    
 }
 """
 tree = parse_text(text)
