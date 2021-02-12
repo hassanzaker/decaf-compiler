@@ -124,7 +124,7 @@ class MyTransformer(Transformer):
 
     def function_void_decl(self, args):
         self.symbol_table.addFunction(Symbol(self.scope, args[0].children[0].value, 'void'))
-        for arg in args[2]:
+        for arg in args[1]:
             if (not isinstance(arg, Tree)) and 'name' in arg and 'type' in arg:
                 self.symbol_table.addVariable(Symbol(self.scope, arg['name'], arg['type']))
         return {'type': 'void', 'name': args[0].children[0].value}

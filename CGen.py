@@ -640,6 +640,8 @@ class Cgen(Transformer):
         id = args[0].children[0]
         value_type = self.symbol_table.getFunction(id).type
         actuals = args[1]
+        print("ss")
+        print(actuals)
         code = "# Storing Frame Pointer and Return Address Before Calling the function : " + id + "\n"
         code += "addi $sp , $sp , -12\n"
         code += "sw $fp , 4($sp)\n"
@@ -662,11 +664,12 @@ class Cgen(Transformer):
         return {'code': code, 'value_type': value_type}
 
     def actuals(self, args):
-        expr1 = args[0]
-        if len(args) > 1:
-            expr2 = args[1]
-            return {'variable_count': len(args), 'code': expr1['code'] + expr2['code']}
-        return {'variable_count': len(args), 'code': expr1['code']}
+        code = ''
+        args = list(args)
+        args.reverse()
+        for arg in args:
+            code += arg['code']
+        return {'variable_count': len(args), 'code': code}
 
     def actual_empty(self, args):
         return {'variable_count': 0, 'code': ''}
@@ -1059,6 +1062,7 @@ class Cgen(Transformer):
         returnType = 'void'
         functionName = args[0].children[0]
         formals = args[1]
+        print(formals)
         stmt_block = args[2]
         for type in stmt_block['return_type']:
             if type != returnType:
