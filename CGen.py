@@ -14,6 +14,7 @@ class Cgen(Transformer):
         self.label_number = 0
         self.break_labels = 0
         self.continue_labels = 0
+        self.builtin_functions = []
 
     def log_code(self, code):
         dirname = os.path.dirname(__file__)
@@ -521,6 +522,8 @@ class Cgen(Transformer):
             return {'code': '', "break_labels": []}
 
     def new_array_exp(self, args):
+        if args[0]['value_type'] != 'int':
+            raise Exception('first argument should be int!')
         code = "# Expression of Array Size\n"
         code += args[0]['code']
         code += "# NewArray of Type : " + args[1] + "\n"
@@ -534,6 +537,61 @@ class Cgen(Transformer):
         code += "sw $v0, 4($sp)\n"
         return {'code': code,
                 'value_type': args[1] + "[]"}
+
+    def read_integer_exp(self, args):
+        self.builtin_functions.append("readInteger")
+        self.builtin_functions.append("readLine")
+        code = "# Read Integer ( Decimal or Hexadecimal ) : \n"
+        code += "# Read Line : \n"
+        code += "addi $sp , $sp , -8\n"
+        code += "sw $fp , 8($sp)\n"
+        code += "sw $ra , 4($sp)\n"
+        code += "jal ReadLine # Calling Read Line Function \n"
+        code += "move $a0 , $v0 # Moving address of string to $a0\n"
+        code += "jal readInteger # Read Integer Function\n"
+        code += "lw $fp , 8($sp)\n"
+        code += "lw $ra , 4($sp)\n"
+        code += "addi $sp , $sp , 4\n"
+        code += "sw $v0 , 4($sp) # Saving Result Read Integer to Stack\n"
+        return {'code': code, 'value_type': 'int'}
+
+    def read_line_exp(self, args):
+        self.builtin_functions.append("readLine")
+        code = "# Read Line : \n"
+        code += "addi $sp , $sp , -8\n"
+        code += "sw $fp , 8($sp)\n"
+        code += "sw $ra , 4($sp)\n"
+        code += "jal ReadLine # Calling Read Line Function \n"
+        code += "lw $fp , 8($sp)\n"
+        code += "lw $ra , 4($sp)\n"
+        code += "addi $sp , $sp , 4\n"
+        code += "sw $v0 , 4($sp)# Saving String Address ( Saved in Heap ) in Stack\n"
+        return {'code': code, 'value_type': 'string'}
+
+    def itod_exp(self, args):
+        type = args[0]['value_type']
+        if type != 'int':
+            raise Exception('first argument should be int!')
+        self.builtin_functions.append("itod")
+        code = "# itod \n"
+        code += "addi $sp , $sp , -8\n"
+        code += "sw $fp , 8($sp)\n"
+        code += "sw $ra , 4($sp)\n"
+        code += "jal itod # Calling itod Function \n"
+        code += "lw $fp , 8($sp)\n"
+        code += "lw $ra , 4($sp)\n"
+        code += "addi $sp , $sp , 4\n"
+        code += "sw $v0 , 4($sp)\n"
+        return {'code': code, 'value_type': 'double'}
+
+    def dtoi_exp(self, args):
+        pass
+
+    def itob(self, args):
+        pass
+
+    def btoi_exp(self, args):
+        pass
 
     def stmt_block(self, args):
         self.scope += 1
@@ -828,16 +886,19 @@ class Cgen(Transformer):
 
     def program(self, args):
         dirname = os.path.dirname(__file__)
-        file = open(dirname + "/default_functions.txt", "r")
-        default_functions = file.read()
-        file.close()
+        temp = set(self.builtin_functions)
+        default_functions = ''
+        for func in temp:
+            file = open(dirname + "/built-in_functions/" + func + ".txt", "r")
+            default_functions += file.read()
+            default_functions += "\n"
+            file.close()
         code = '.text\n'
         code += '.globl main\n'
         code += default_functions
         code += "\n"
         code += self.classes.getConstructor()
         for arg in args:
-            print(arg)
             code += arg['code']
         self.data_code += self.symbol_table.getData()
         self.data_code += self.classes.getVtables()

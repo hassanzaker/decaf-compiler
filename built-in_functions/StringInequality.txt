@@ -1,0 +1,9 @@
+StringsInequality:
+	addi $sp , $sp , -4
+	sw $ra , 4($sp)
+	jal StringsEquality
+	addi $sp , $sp , 4
+	lw $ra , 0($sp)
+	nor $v0 , $v0 , $v0
+	addi $v0 , $v0 , 2 # All 1's from bit[1] to left becomes Zero
+	jr $ra

@@ -80,14 +80,14 @@ def create_parser():
             | expr "&&" expr -> exp_and_exp
             | expr "||" expr -> exp_or_exp
             | "!" expr -> exp_not
-            | "ReadInteger" "(" ")" 
-            | "readLine" "(" ")" 
+            | "readInteger" "(" ")" -> read_integer_exp
+            | "readLine" "(" ")" -> read_line_exp
             | "new" ident -> new_ident_exp
             | "NewArray" "(" expr "," type ")"  -> new_array_exp
-            | "itod" "(" expr ")" 
-            | "dtoi" "(" expr ")" 
-            | "itob" "(" expr ")" 
-            | "btoi" "(" expr ")"
+            | "itod" "(" expr ")" -> itod_exp
+            | "dtoi" "(" expr ")" -> dtoi_exp
+            | "itob" "(" expr ")" -> itob_exp
+            | "btoi" "(" expr ")" -> btoi_exp
             
         l_value : ident -> lvalue_id
             | expr "." ident -> get_class_variable

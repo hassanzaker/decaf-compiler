@@ -7,16 +7,12 @@ class ali{
 int x;
 }
 int main() {
-    int[] a;
-    a = NewArray(3, int);
-    a[0] = 2;
-    a[1] = 3;
-    a[2] = 54;
+    int a;
+    double d;
+    a = 5;
+    d = itod(a);
     print(a);
-    print(a[0]);
-    print(a[1]);
-    print(a[2]);
-    
+    print(d);
 }
 """
 tree = parse_text(text)
