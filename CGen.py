@@ -38,6 +38,20 @@ class Cgen(Transformer):
             code += "l.s $f1 , 4($sp)\n"
             code += "add.s $f0 , $f0 , $f1\n"
             code += "s.s $f0 , 8($sp)\n"
+        elif value_type1 == 'string' and value_type2 == value_type1:
+            self.builtin_functions.append('str_concat')
+            code += "lw $a0 , 8($sp)\n"
+            code += "lw $a1 , 4($sp)\n"
+            code += "la $a2, __result"
+            code += "addi $sp , $sp , -8\n"
+            code += "sw $fp , 8($sp)\n"
+            code += "sw $ra , 4($sp)\n"
+            code += "jal strcat # Calling Function to concatenation of two Strings\n"
+            code += "lw $fp , 8($sp)\n"
+            code += "lw $ra , 4($sp)\n"
+            code += "addi $sp , $sp , 8\n"
+            code += "la $t0, __result\n"
+            code += "sw $t0 , 8($sp) \n"
         # TODO --> append two string (or array) when we want to add them
         else:
             raise Exception("Can Not Add " + value_type1 + " to " + value_type2 + "!")
@@ -115,6 +129,11 @@ class Cgen(Transformer):
             code += "div $t0 , $t1\n"
             code += "mfhi $t0\n"
             code += "sw $t0 , 8($sp)\n"
+        elif value_type1 == 'double' and value_type2 == value_type1:  #TODO this is wrong
+            code += "l.s $f0 , 8($sp)\n"
+            code += "l.s $f1 , 4($sp)\n"
+            code += "div.s $f0 , $f0 , $f1\n"
+            code += "s.s $f0 , 8($sp)\n"
         else:
             raise Exception("this operator is just for int by int !")
         code += "addi $sp , $sp , 4\n"
@@ -299,6 +318,26 @@ class Cgen(Transformer):
             code += "lw $ra , 4($sp)\n"
             code += "addi $sp , $sp , 8\n"
             code += "sw $v0 , 8($sp) # Saving Result of Equality of two Strings\n"
+        elif value_type1 == value_type2:
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "beq $t0 , $t1 , " + first_label + "\n"
+            code += "li $t0, 0\n"
+            code += "j " + second_label + "\n"
+            code += first_label + " :\n"
+            code += "li $t0 , 1\n"
+            code += second_label + " :\n"
+            code += "sw $t0 , 8($sp)\n"
+        elif value_type1 == 'null_type' or value_type2 == 'null_type':
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "beq $t0 , $t1 , " + first_label + "\n"
+            code += "li $t0, 0\n"
+            code += "j " + second_label + "\n"
+            code += first_label + " :\n"
+            code += "li $t0 , 1\n"
+            code += second_label + " :\n"
+            code += "sw $t0 , 8($sp)\n"
         else:
             raise Exception("Can Not compare " + value_type1 + " with " + value_type2 + "!")
         code += "addi $sp , $sp , 4\n"
@@ -347,6 +386,26 @@ class Cgen(Transformer):
             code += "lw $ra , 4($sp)\n"
             code += "addi $sp , $sp , 8\n"
             code += "sw $v0 , 8($sp) \n"
+        elif value_type2 == value_type1:
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "bne $t0 , $t1 , " + first_label + "\n"
+            code += "li $t0, 0\n"
+            code += "j " + second_label + "\n"
+            code += first_label + " :\n"
+            code += "li $t0 , 1\n"
+            code += second_label + " :\n"
+            code += "sw $t0 , 8($sp)\n"
+        elif value_type1 == 'null_type' or value_type2 == 'null_type':
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "bne $t0 , $t1 , " + first_label + "\n"
+            code += "li $t0, 0\n"
+            code += "j " + second_label + "\n"
+            code += first_label + " :\n"
+            code += "li $t0 , 1\n"
+            code += second_label + " :\n"
+            code += "sw $t0 , 8($sp)\n"
         else:
             raise Exception("Can Not compare " + value_type1 + " with " + value_type2 + "!")
         code += "addi $sp , $sp , 4\n"
@@ -975,5 +1034,6 @@ class Cgen(Transformer):
         self.data_code += "new_line : .asciiz \"\n\" \n"
         self.data_code += "str_bool : .word str_false , str_true\n"
         self.data_code += "obj_null : .word 61235\n"
+        self.data_code += "__result: .space 200\n"
         self.log_code(code + "\n\n.data\n" + self.data_code)
         return args

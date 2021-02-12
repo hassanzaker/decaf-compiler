@@ -7,8 +7,11 @@ class ali{
 int x;
 }
 int main() {
-    double a;
-    print(a);
+    string a;
+    string b;
+    a = "ali";
+    b = " zaker";
+    print(a + b);
 }
 """
 tree = parse_text(text)
