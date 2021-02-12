@@ -1,11 +1,9 @@
 dtoi:
-	l.s $f0 , 4($sp)
-	cvt.w.s $f1,$f0 double
-    mtc1 $v0 , $f1
-    cvt.s.w $f1 , $f
+	cvt.w.s $f1,$f0
     mfc1 $v0 , $f1 # $v0 is floor of double
-    # Convert $v0 to1
-    # get decimal
+    # Convert $v0 to double
+    mtc1 $v0 , $f1
+    cvt.s.w $f1 , $f1
     sub.s $f0 , $f0 , $f1
     li.s $f1 , 0.0
     c.lt.s $f0 , $f1

@@ -1,21 +1,7 @@
 .text
 .globl main
-itod:
-	lw $t0 , 4($sp)
-#	lw $a0 , 4($sp)
-#	li $v0 , 1
-#	syscall
-#	li $v0 , 4
- #   la $a0 , new_line
-#    syscall
-    mtc1 $t0, $f12
-    cvt.s.w $f12, $f12
-    mov.s $f0 , $f12
- #   li $v0 , 2
-#    syscall
-#    li $v0 , 4
- #   la $a0 , new_line
-  #  syscall
+btoi:
+    addi $v0, $t0 , 0
 	jr $ra
 
 # Constructor for Class : ali
@@ -34,13 +20,13 @@ addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5
 addi $sp , $sp , -8 # Allocate From Stack For Block Statement Variables
 addi $fp , $sp , 4
 # Left Hand Side Assign
-# Loading Address of ID : a
-addi $s7 , $fp , 0
-sw $s7, 0($sp) # Push Address of 0 to Stack
+# Loading Address of ID : b
+addi $s7 , $fp , 4
+sw $s7, 0($sp) # Push Address of 4 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
-# Int Constant : 5
-li $t0 , 5
+# Bool Constant : true
+li $t0 , 1
 sw $t0 , 0($sp)
 addi $sp, $sp, -4
 # Assign Right Side to Left
@@ -52,25 +38,26 @@ addi $sp , $sp , 4
 # End of Expression Optional
 addi $sp , $sp 4
 # Left Hand Side Assign
-# Loading Address of ID : d
-addi $s7 , $fp , 4
-sw $s7, 0($sp) # Push Address of 4 to Stack
+# Loading Address of ID : a
+addi $s7 , $fp , 0
+sw $s7, 0($sp) # Push Address of 0 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
-# itod 
+# btoi 
 addi $sp , $sp , -8
+lw $t0 , 8($sp)
 sw $fp , 8($sp)
 sw $ra , 4($sp)
-jal itod # Calling itod Function 
+jal btoi # Calling btoi Function 
 lw $fp , 8($sp)
 lw $ra , 4($sp)
 addi $sp , $sp , 4
 sw $v0 , 4($sp)
 # Assign Right Side to Left
 lw $t0 , 8($sp)
-l.s $f0 , 4($sp)
-s.s $f0 , 0($t0)
-s.s $f0 , 8($sp)
+lw $t1 , 4($sp)
+sw $t1 , 0($t0)
+sw $t1 , 8($sp)
 addi $sp , $sp , 4
 # End of Expression Optional
 addi $sp , $sp 4
@@ -90,7 +77,7 @@ syscall
 li $v0 , 4
 la $a0 , new_line
 syscall
-# Loading Address of ID : d
+# Loading Address of ID : b
 addi $s7 , $fp , 4
 sw $s7, 0($sp) # Push Address of 4 to Stack
 addi $sp, $sp, -4
@@ -100,8 +87,12 @@ lw $t0 , 0($t0)
 sw $t0 , 4($sp)
 # Print expr : 
 addi $sp , $sp , 4 # Pop Expression of Print
-l.s $f12 , 0($sp)
-li $v0 , 2
+lw $a0 , 0($sp)
+la $t0 , str_bool
+sll $a0 , $a0 , 2
+add $a0 , $a0 , $t0
+lw $a0 , 0($a0)
+li $v0 , 4
 syscall
 li $v0 , 4
 la $a0 , new_line
@@ -115,7 +106,7 @@ jr $ra
 
 
 .data
-d1 : .float 0.0
+b1 : .word 0
 ali_vtable:
 str_false : .asciiz "false" 
 str_true : .asciiz "true" 

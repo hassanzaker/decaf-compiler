@@ -1,5 +1,5 @@
 itob:
-	lw $v0 , 4($sp)
+	addi $v0 , $t0 , 0
 	beqz $v0 , end_conversion_itob
 	li $v0 , 1
 	end_conversion_itob:

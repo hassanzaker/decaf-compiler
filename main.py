@@ -8,11 +8,11 @@ int x;
 }
 int main() {
     int a;
-    double d;
-    a = 5;
-    d = itod(a);
+    bool b;
+    b = true;
+    a = btoi(b);
     print(a);
-    print(d);
+    print(b);
 }
 """
 tree = parse_text(text)

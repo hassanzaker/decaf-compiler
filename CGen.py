@@ -575,23 +575,66 @@ class Cgen(Transformer):
         self.builtin_functions.append("itod")
         code = "# itod \n"
         code += "addi $sp , $sp , -8\n"
+        code += "lw $t0 , 8($sp)\n"
         code += "sw $fp , 8($sp)\n"
         code += "sw $ra , 4($sp)\n"
         code += "jal itod # Calling itod Function \n"
         code += "lw $fp , 8($sp)\n"
         code += "lw $ra , 4($sp)\n"
         code += "addi $sp , $sp , 4\n"
-        code += "sw $v0 , 4($sp)\n"
+        code += "s.s $f0 , 4($sp)\n"
         return {'code': code, 'value_type': 'double'}
 
     def dtoi_exp(self, args):
-        pass
+        type = args[0]['value_type']
+        if type != 'double':
+            raise Exception('first argument should be double!')
+        self.builtin_functions.append("dtoi")
+        code = "# dtoi \n"
+        code += "addi $sp , $sp , -8\n"
+        code += "l.s $f0 , 8($sp)\n"
+        code += "sw $fp , 8($sp)\n"
+        code += "sw $ra , 4($sp)\n"
+        code += "jal dtoi # Calling dtoi Function \n"
+        code += "lw $fp , 8($sp)\n"
+        code += "lw $ra , 4($sp)\n"
+        code += "addi $sp , $sp , 4\n"
+        code += "sw $v0 , 4($sp)\n"
+        return {'code': code, 'value_type': 'int'}
 
-    def itob(self, args):
-        pass
+    def itob_exp(self, args):
+        type = args[0]['value_type']
+        if type != 'int':
+            raise Exception('first argument should be int!')
+        self.builtin_functions.append("itob")
+        code = "# itob \n"
+        code += "addi $sp , $sp , -8\n"
+        code += "lw $t0 , 8($sp)\n"
+        code += "sw $fp , 8($sp)\n"
+        code += "sw $ra , 4($sp)\n"
+        code += "jal itob # Calling itob Function \n"
+        code += "lw $fp , 8($sp)\n"
+        code += "lw $ra , 4($sp)\n"
+        code += "addi $sp , $sp , 4\n"
+        code += "sw $v0 , 4($sp)\n"
+        return {'code': code, 'value_type': 'bool'}
 
     def btoi_exp(self, args):
-        pass
+        type = args[0]['value_type']
+        if type != 'bool':
+            raise Exception('first argument should be bool!')
+        self.builtin_functions.append("btoi")
+        code = "# btoi \n"
+        code += "addi $sp , $sp , -8\n"
+        code += "lw $t0 , 8($sp)\n"
+        code += "sw $fp , 8($sp)\n"
+        code += "sw $ra , 4($sp)\n"
+        code += "jal btoi # Calling btoi Function \n"
+        code += "lw $fp , 8($sp)\n"
+        code += "lw $ra , 4($sp)\n"
+        code += "addi $sp , $sp , 4\n"
+        code += "sw $v0 , 4($sp)\n"
+        return {'code': code, 'value_type': 'int'}
 
     def stmt_block(self, args):
         self.scope += 1
