@@ -81,7 +81,7 @@ class MyTransformer(Transformer):
             if cls.doesMethodExist(method['name']):
                 raise Exception(method['name'] + " is defined more than one time!")
             else:
-                cls.addMethod(method)
+                cls.addMethod(method, self.scope, method['formals'])
         return cls
 
 
@@ -98,14 +98,14 @@ class MyTransformer(Transformer):
             if arg['field'] == "variable":
                 variables.append({'access_level': arg['access_level'], 'name': arg['name'], 'type': arg['type']})
             else:
-                methods.append({'access_level': arg['access_level'], 'name': arg['name'], 'type': arg['type']})
+                methods.append({'access_level': arg['access_level'], 'name': arg['name'], 'type': arg['type'], 'formals': arg['formals']})
         return {'variables': variables, 'methods': methods}
 
     def variable_field(self, args):
         return {'field': 'variable', 'access_level': args[0], 'name': args[1]['name'], 'type': args[1]['type']}
 
     def method_field(self, args):
-        return {'field': 'method', "access_level": args[0], 'name': args[1]['name'], 'type': args[1]['type']}
+        return {'field': 'method', "access_level": args[0], 'name': args[1]['name'], 'type': args[1]['type'], 'formals': args[1]['formals']}
 
     def func_decl(self, args):
         self.scope += 1
@@ -115,7 +115,7 @@ class MyTransformer(Transformer):
                 self.symbol_table.addVariable(Symbol(self.scope, arg['name'], arg['type']))
                 formals.append(arg['type'])
         self.symbol_table.addFunction(Function(self.scope, args[1].children[0].value, args[0], formals))
-        return {'type': args[0], 'name': args[1].children[0].value}
+        return {'type': args[0], 'name': args[1].children[0].value, 'formals': formals}
 
 
     def func_decl_data_type(self, args):
@@ -126,7 +126,7 @@ class MyTransformer(Transformer):
                 self.symbol_table.addVariable(Symbol(self.scope, arg['name'], arg['type']))
                 formals.append(arg['type'])
         self.symbol_table.addFunction(Function(self.scope, args[1].children[0].value, args[0], formals))
-        return {'type': args[0].value, 'name': args[1].children[0].value}
+        return {'type': args[0].value, 'name': args[1].children[0].value, 'formals': formals}
 
     def function_void_decl(self, args):
         self.scope += 1
@@ -136,7 +136,7 @@ class MyTransformer(Transformer):
                 self.symbol_table.addVariable(Symbol(self.scope, arg['name'], arg['type']))
                 formals.append(arg['type'])
         self.symbol_table.addFunction(Function(self.scope, args[0].children[0].value, args[0], formals))
-        return {'type': 'void', 'name': args[0].children[0].value}
+        return {'type': 'void', 'name': args[0].children[0].value, 'formals': formals}
 
     def variable_decl(self, args):
         return args[0]

@@ -93,7 +93,7 @@ def create_parser():
             | expr "." ident -> get_class_variable
             | expr "[" expr "]" -> get_array_item
         call : ident "(" actuals ")" -> call_global_func
-            | expr "." ident "(" actuals ")"
+            | expr "." ident "(" actuals ")" -> call_class_func
         actuals : expr ("," expr)* -> actuals
             | -> actual_empty
         
