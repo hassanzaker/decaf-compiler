@@ -5,19 +5,24 @@ from CGen import *
 text = """
 
 int main() {
+    int a;
+    int b;
     int i;
-    i = 0;
-    for(i=2;i < 5;i = i +1)
-    {
-    i = i + 1;
-    if (i == 4){
-    continue;
+
+    b = 0;
+    for(i = 1; true; i = i + 1) {
+        print("Please enter the #", i, " number:");
+        a = readInteger();
+        if (a < 0){
+            break;
+            }
+            
+            b = a + b;
+           
+       
     }
-    else{
-    print(i);
-    }
-    }
-    
+
+    print("Sum of ", i, " items is: ", b);
 }
 """
 tree = parse_text(text)

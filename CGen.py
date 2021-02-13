@@ -873,25 +873,45 @@ class Cgen(Transformer):
 
     def if_stmt(self, args):
         exp = args[0]
-        stmt_true = args[1]
-        stmt_false = args[2]
-        first_label = "label" + str(self.string_numbers)
-        self.string_numbers += 1
-        second_label = "label" + str(self.string_numbers)
-        self.string_numbers += 1
-        if exp['value_type'] == 'bool':
-            code = exp['code']
-            code += "addi $sp , $sp , 4\n"
-            code += "lw $t0 , 0($sp)\n"
-            code += "beq $t0 , $zero , " + first_label + "\n"
-            code += stmt_true['code']
-            code += "j " + second_label + "\n"
-            code += first_label + " :\n"
-            code += stmt_false['code']
-            code += second_label + " :\n"
+        if len(args) == 3:
+            stmt_true = args[1]
+            stmt_false = args[2]
+            first_label = "label" + str(self.string_numbers)
+            self.string_numbers += 1
+            second_label = "label" + str(self.string_numbers)
+            self.string_numbers += 1
+            if exp['value_type'] == 'bool':
+                code = exp['code']
+                code += "addi $sp , $sp , 4\n"
+                code += "lw $t0 , 0($sp)\n"
+                code += "beq $t0 , $zero , " + first_label + "\n"
+                code += stmt_true['code']
+                code += "j " + second_label + "\n"
+                code += first_label + " :\n"
+                code += stmt_false['code']
+                code += second_label + " :\n"
+            else:
+                raise Exception("condition should be bool type!")
+            return {'code': code, 'break_labels': args[1]['break_labels'], 'continue_labels': args[1]['continue_labels']}
         else:
-            raise Exception("condition should be bool type!")
-        return {'code': code, 'break_labels': args[1]['break_labels'], 'continue_labels': args[1]['continue_labels']}
+            stmt_true = args[1]
+
+            first_label = "label" + str(self.string_numbers)
+            self.string_numbers += 1
+
+            if exp['value_type'] == 'bool':
+                code = exp['code']
+                code += "addi $sp , $sp , 4\n"
+                code += "lw $t0 , 0($sp)\n"
+                code += "beq $t0 , $zero , " + first_label + "\n"
+                code += stmt_true['code']
+
+                code += first_label + " :\n"
+
+
+            else:
+                raise Exception("condition should be bool type!")
+            return {'code': code, 'break_labels': args[1]['break_labels'], 'continue_labels': args[1]['continue_labels']}
 
     def stmt_stmt_block(self, args):
         return args[0]
