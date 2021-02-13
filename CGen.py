@@ -611,9 +611,9 @@ class Cgen(Transformer):
             code = args[0]['code']
             code += "# End of Expression Optional\n"
             code += "addi $sp , $sp 4\n"
-            return {'code': code, "break_labels": []}
+            return {'code': code, "break_labels": [] ,  'continue_labels' : []}
         else:
-            return {'code': '', "break_labels": []}
+            return {'code': '', "break_labels": [] ,  'continue_labels' : []}
 
     def new_array_exp(self, args):
         if args[0]['value_type'] != 'int':
@@ -793,6 +793,7 @@ class Cgen(Transformer):
                 stmts.append(arg)
 
         break_labels = []
+        continue_labels = []
         code = "# Begin of Statement Block\n"
         code += "addi $sp , $sp , -" + str(
             variable_count * 4) + " # Allocate From Stack For Block Statement Variables\n"
@@ -800,13 +801,15 @@ class Cgen(Transformer):
         for stmt in stmts:
             code += stmt['code']
             break_labels.extend(stmt['break_labels'])
+            continue_labels.extend(stmt['continue_labels'])
+
         code += "addi $sp , $sp , " + str(
             variable_count * 4) + " # UnAllocate Stack Area (Removing Block Statement Variables)\n"
         code += "addi $fp ,$sp , 4\n"
         code += "# End of Statement Block\n"
         self.symbol_table.removeFromScop(self.scope)
         return_types = list(set(return_types))
-        return {'code': code, 'break_labels': break_labels, 'return_type': return_types}
+        return {'code': code, 'break_labels': break_labels,'continue_labels':continue_labels ,'return_type': return_types}
 
     def if_stmt(self, args):
         exp = args[0]
@@ -828,16 +831,22 @@ class Cgen(Transformer):
             code += second_label + " :\n"
         else:
             raise Exception("condition should be bool type!")
-        return {'code': code, 'break_labels': args[1]['break_labels']}
+        return {'code': code, 'break_labels': args[1]['break_labels'],'continue_labels': args[1]['continue_labels']}
 
     def stmt_stmt_block(self, args):
         return args[0]
 
     def stmt_if_stmt(self, args):
         code = "#End of if statement\n"
-        return {'code': args[0]['code'] + code, 'break_labels': args[0]['break_labels']}
+        return {'code': args[0]['code'] + code, 'break_labels': args[0]['break_labels'], 'continue_labels': args[0]['continue_labels']}
 
     def find_break_label(self, arr, name):
+        for item in arr:
+            if item['name'] == name:
+                return item['count']
+        raise Exception("no label found for " + name)
+
+    def find_continue_label(self, arr, name):
         for item in arr:
             if item['name'] == name:
                 return item['count']
@@ -859,6 +868,16 @@ class Cgen(Transformer):
             code_for_break += "j " + second_label + " # Break from loop while\n"
             stmt['code'] = stmt['code'].replace("@" + break_label + "@", code_for_break)
 
+        continue_labels = stmt["continue_labels"]
+        pattern_c = re.compile(r'@(continue\d+)@')
+        for continue_label in re.findall(pattern_c, stmt['code']):
+            count_c = self.find_continue_label(continue_labels, continue_label)
+            code_for_continue = "addi $sp , $sp , " + str(count_c * 4) + " # Pop elements before\n"
+            code_for_continue += "addi $fp , $sp , 4 # Set Frame Pointer\n"
+            code_for_continue += "j " + first_label + " # continue from loop while\n"
+            stmt['code'] = stmt['code'].replace("@" + continue_label + "@", code_for_continue)
+
+
         if exp["value_type"] == "bool":
             code = first_label + ": # Starting While Loop Body\n"
             code += "# Calculating While Condition\n"
@@ -872,11 +891,11 @@ class Cgen(Transformer):
             code += second_label + ":\n"
         else:
             raise Exception("condition should be bool type!")
-        return {'code': code, 'break_labels': []}
+        return {'code': code, 'break_labels': [],'continue_labels':[]}
 
     def stmt_while_stmt(self, args):
         code = "#End of while statement\n"
-        return {'code': args[0]['code'] + code, 'break_labels': args[0]['break_labels']}
+        return {'code': args[0]['code'] + code, 'break_labels': args[0]['break_labels'], 'continue_labels': args[0]['continue_labels']}
 
     def for_stmt(self, args):
         number_of_elem = len(args)
@@ -922,7 +941,7 @@ class Cgen(Transformer):
         #     code += "addi $sp , $sp , 4 # pop step expr of loop for\n"
         code += "j " + second_label + " # Jumping to beggining of while loop\n"
         code += second_label + ":\n"
-        return {'code': code, 'break_labels': []}
+        return {'code': code, 'break_labels': [],'continue_labels' :[]}
 
     def stmt_for_stmt(self, args):
         return args[0]
@@ -938,13 +957,14 @@ class Cgen(Transformer):
         return {'code': code}
 
     def stmt_break_stmt(self, args):
-        return {'code': args[0]['code'], 'break_labels': [{'name': args[0]['code'][1:-2], 'count': 0}]}
+        return {'code': args[0]['code'],'continue_labels' : [], 'break_labels': [{'name': args[0]['code'][1:-2], 'count': 0}]}
 
     def stmt_continue_stmt(self, args):
-        return {'code': args[0]['code'], 'continue': [{'name': args[0]['code'][1:-2], 'count': 0}]}
+        return {'code': args[0]['code'],'break_labels':[], 'continue_labels': [{'name': args[0]['code'][1:-2], 'count': 0}]}
 
     def stmt_return_stmt(self, args):
         args[0]['break_labels'] = []
+        args[0]['continue_labels'] = []
         args[0]['return_type'] = args[0]['return_type']
         return args[0]
 
@@ -1084,7 +1104,7 @@ class Cgen(Transformer):
         return {'code': code, 'name': functionName, 'value_type': 'void'}
 
     def stmt_print_stmt(self, args):
-        return {'code': args[0]['code'], 'break_labels': []}
+        return {'code': args[0]['code'], 'break_labels': [] , 'continue_labels' : []}
 
     def print_stmt(self, args):
         code = ''

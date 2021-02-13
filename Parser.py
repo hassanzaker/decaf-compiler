@@ -57,7 +57,7 @@ def create_parser():
         for_stmt: "for" "(" (expr)? ";" expr ";" (expr)? ")" stmt ->for_stmt
         return_stmt : "return" (expr)? ";" -> return_stmt
         break_stmt : "break" ";" -> break_stmt
-        continue_stmt : "continue;" ->continue_stmt
+        continue_stmt : "continue" ";" -> continue_stmt
         print_stmt : "print" "(" expr (","expr)* ")" ";" -> print_stmt
         expr : l_value "=" expr -> expr_assign
             | constant -> expr_constant

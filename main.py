@@ -3,25 +3,19 @@ from SemanticAnalyser import *
 from CGen import *
 
 text = """
-int f(int a){
-if (a == 0)
-    return 1;
-else
-    return a * f(a - 1);
-}
-int h(int a){
-if (a == 0)
-    return 0;
-else
-    return a * f(a - 1);
-}
-class ali{
-int x;
-int a;
-int b;
-}
+
 int main() {
-    print(f(10));
+    int i;
+    i = 0;
+    for(;4<5;)
+    {
+    if (i == 5){
+    continue;
+    }
+    else{
+    print(2);
+    }
+    }
     
 }
 """

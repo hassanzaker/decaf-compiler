@@ -2,11 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f72968f3-da95-4d80-a7b1-2346417fd40e" name="Default Changelist" comment="add functions for break and continue">
-      <change afterPath="$PROJECT_DIR$/Variable.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CGen.py" beforeDir="false" afterPath="$PROJECT_DIR$/CGen.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SemanticAnalyser.py" beforeDir="false" afterPath="$PROJECT_DIR$/SemanticAnalyser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/Parser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/result.s" beforeDir="false" afterPath="$PROJECT_DIR$/result.s" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,7 +39,6 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/buil-in_functions" />
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
