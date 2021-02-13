@@ -566,8 +566,6 @@ class Cgen(Transformer):
         return args[0]
 
     def expr_assign(self, args):
-        print(args[0])
-        print(args[1])
         if args[0]['value_type'] != args[1]['value_type']:
             raise Exception("can not assign " + args[1]['value_type'] + " to " + args[0]['value_type'] + "!")
         value_type = args[0]['value_type']
@@ -656,7 +654,7 @@ class Cgen(Transformer):
         code += "sw $s5 , 12($sp)\n"
         code += "# Function Arguments\n"
         code += actuals['code']
-        code += "jal " + str(id) + " # Calling Function\n"
+        code += "jal __" + str(id) + " # Calling Function\n"
         code += "# Pop Arguments of function\n"
         code += "addi $sp , $sp , " + str(actuals['variable_count'] * 4) + "\n"
         code += "# Load Back Frame Pointer and Return Address After Function call\n"
@@ -701,7 +699,7 @@ class Cgen(Transformer):
         code += obj_expr['code']
         code += "lw $t0 , 4($sp)\n"
         code += "lw $t0 , 0($t0) # Loading Vtable\n"
-        code += "addi $t0 , $t0 , " + str(methodOffset) + " # Adding offset of Method in Vtable\n"
+        code += "addi $t0 , $t0 , " + str(methodOffset) + "# Adding offset of Method in Vtable\n"
         code += "lw $t0 , 0($t0) # t0 now contains the address of function\n"
         code += "sw $t0 , 0($sp) # Storing Function Address in Stack \n"
         code += "addi $sp , $sp , -4\n"
@@ -716,7 +714,7 @@ class Cgen(Transformer):
         code += "sw $t0 , 0($sp) # Pushing object as \"this\" as first argument of method\n"
         code += "lw $t0 , " + str(actuals['variable_count'] * 4 + 12 + 4) + "($sp) # Loading Method of object\n"
         code += "addi $sp , $sp , -4\n"
-        code += "jal $t0 # Calling Object's method\n"
+        code += "jal __" + str(object_type)+ "_" + str(function_id) + " # Calling Object's method\n"
         code += "addi $sp , $sp , " + str(actuals['variable_count'] * 4 + 4) + " # Pop Arguments of Method\n"
         code += "# Load Back Frame Pointer and Return Address After Function call\n"
         code += "lw $fp , 4($sp)\n"
@@ -1099,7 +1097,10 @@ class Cgen(Transformer):
             if type != returnType:
                 raise Exception('this function can not return a ' + type + "!")
         label_end = functionName + "_end"
-        code = functionName + ": # Start function\n"
+        if functionName == "main":
+            code = functionName + ": # main function\n"
+        else:
+            code = "__" + functionName + ": # Start function\n"
         code += "addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5\n"
         code += "# Function Body :\n"
         code += stmt_block['code']
@@ -1119,7 +1120,7 @@ class Cgen(Transformer):
             if type != returnType:
                 raise Exception('this function can not return an object of  ' + type + "!")
         label_end = functionName + "_end"
-        code = functionName + ": # Start function\n"
+        code = "__" + functionName + ": # Start function\n"
         code += "addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5\n"
         code += "# Function Body :\n"
         code += stmt_block['code']
@@ -1137,7 +1138,7 @@ class Cgen(Transformer):
         for type in stmt_block['return_type']:
             if type != returnType:
                 raise Exception('this function can not return a ' + type + "!")
-        label_end = functionName + "_end"
+        label_end = "__" + functionName + "_end"
         code = functionName + ": # Start function\n"
         code += "addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5\n"
         code += "# Function Body :\n"

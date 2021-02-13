@@ -10,16 +10,20 @@ la $t0 , ali_vtable # Loading Vtable Address of this Class
 sw $t0 , 0($v0) # Storing Vtable pointer at index 0 of object
 jr $ra
 
-ali_f: # Start function
+__ali_f: # Start function
 addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5
 # Function Body :
 # Begin of Statement Block
 addi $sp , $sp , -0 # Allocate From Stack For Block Statement Variables
 addi $fp , $sp , 4
-# Int Constant : 3
-li $t0 , 3
-sw $t0 , 0($sp)
+# Loading Address of ID : b
+addi $s7 , $fp , 4
+sw $s7, 0($sp) # Push Address of 4 to Stack
 addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
 lw $v0 , 4($sp) # Loading Return Value of function
 addi $sp , $sp , 4
 move $sp , $s5
@@ -31,7 +35,46 @@ lw $v0, 0($sp)
 ali_f_end:
 jr $ra
 
-main: # Start function
+__add: # Start function
+addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5
+# Function Body :
+# Begin of Statement Block
+addi $sp , $sp , -0 # Allocate From Stack For Block Statement Variables
+addi $fp , $sp , 4
+# Loading Address of ID : s
+addi $s7 , $fp , 8
+sw $s7, 0($sp) # Push Address of 8 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Loading Address of ID : t
+addi $s7 , $fp , 12
+sw $s7, 0($sp) # Push Address of 12 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Add Expression
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+add $t0 , $t0 , $t1
+sw $t0 , 8($sp)
+addi $sp , $sp , 4
+lw $v0 , 4($sp) # Loading Return Value of function
+addi $sp , $sp , 4
+move $sp , $s5
+jr $ra # Return Function
+addi $sp , $sp , 0 # UnAllocate Stack Area (Removing Block Statement Variables)
+addi $fp ,$sp , 4
+# End of Statement Block
+lw $v0, 0($sp)
+add_end:
+jr $ra
+
+main: # main function
 addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5
 # Function Body :
 # Begin of Statement Block
@@ -39,8 +82,8 @@ addi $sp , $sp , -8 # Allocate From Stack For Block Statement Variables
 addi $fp , $sp , 4
 # Left Hand Side Assign
 # Loading Address of ID : a
-addi $s7 , $fp , 0
-sw $s7, 0($sp) # Push Address of 0 to Stack
+addi $s7 , $fp , 16
+sw $s7, 0($sp) # Push Address of 16 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # new object of type : ali
@@ -59,15 +102,15 @@ addi $sp , $sp , 4
 addi $sp , $sp 4
 # Left Hand Side Assign
 # Loading Address of ID : b
-addi $s7 , $fp , 4
-sw $s7, 0($sp) # Push Address of 4 to Stack
+addi $s7 , $fp , 20
+sw $s7, 0($sp) # Push Address of 20 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # Calling Method of Object
 # Object Expression
 # Loading Address of ID : a
-addi $s7 , $fp , 0
-sw $s7, 0($sp) # Push Address of 0 to Stack
+addi $s7 , $fp , 16
+sw $s7, 0($sp) # Push Address of 16 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
@@ -75,7 +118,7 @@ lw $t0 , 0($t0)
 sw $t0 , 4($sp)
 lw $t0 , 4($sp)
 lw $t0 , 0($t0) # Loading Vtable
-addi $t0 , $t0 , 0 # Adding offset of Method in Vtable
+addi $t0 , $t0 , 0# Adding offset of Method in Vtable
 lw $t0 , 0($t0) # t0 now contains the address of function
 sw $t0 , 0($sp) # Storing Function Address in Stack 
 addi $sp , $sp , -4
@@ -85,12 +128,20 @@ sw $fp , 4($sp)
 sw $ra , 8($sp)
 sw $s5 , 12($sp)
 # Method's Arguments 
-lw $t0 , 20($sp) # Loading Object being called
+# Int Constant : 9
+li $t0 , 9
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+# Int Constant : 4
+li $t0 , 4
+sw $t0 , 0($sp)
+addi $sp, $sp, -4
+lw $t0 , 28($sp) # Loading Object being called
 sw $t0 , 0($sp) # Pushing object as "this" as first argument of method
-lw $t0 , 16($sp) # Loading Method of object
+lw $t0 , 24($sp) # Loading Method of object
 addi $sp , $sp , -4
-jal $t0 # Calling Object's method
-addi $sp , $sp , 4 # Pop Arguments of Method
+jal __ali_f # Calling Object's method
+addi $sp , $sp , 12 # Pop Arguments of Method
 # Load Back Frame Pointer and Return Address After Function call
 lw $fp , 4($sp)
 lw $ra , 8($sp)
@@ -106,8 +157,8 @@ addi $sp , $sp , 4
 # End of Expression Optional
 addi $sp , $sp 4
 # Loading Address of ID : b
-addi $s7 , $fp , 4
-sw $s7, 0($sp) # Push Address of 4 to Stack
+addi $s7 , $fp , 20
+sw $s7, 0($sp) # Push Address of 20 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
@@ -131,7 +182,11 @@ jr $ra
 
 
 .data
-b3 : .word 0
+a2 : .word 0
+b2 : .word 0
+s4 : .word 0
+t4 : .word 0
+a5 : .word 0
 ali_vtable:
 	.word ali_f
 str_false : .asciiz "false" 
