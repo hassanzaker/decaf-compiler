@@ -16,6 +16,7 @@ class Cgen(Transformer):
         self.continue_labels = 0
         self.builtin_functions = []
         self.stack = []
+        self.last_class = 0
 
     def log_code(self, code):
         dirname = os.path.dirname(__file__)
@@ -516,7 +517,9 @@ class Cgen(Transformer):
         name = args[0].children[0].value
         var, address = self.symbol_table.getVariable(name, self.scope)
         code = "# Loading Address of ID : " + var.name + "\n"
-        code += "addi $s7 , $fp , " + str(address) + "\n"
+        code += "li $s6 , 0\n"
+        code += "addi $s6 , $s6 , " + str(address) + "\n"
+        code += "add $s7 , $fp , $s6\n"
         code += 'sw $s7, 0($sp)' + ' # Push Address of ' + str(address) + ' to Stack\n'
         code += 'addi $sp, $sp, -4\n'
         return {'code': code,
@@ -566,6 +569,7 @@ class Cgen(Transformer):
         return args[0]
 
     def expr_assign(self, args):
+
         if args[0]['value_type'] != args[1]['value_type']:
             raise Exception("can not assign " + args[1]['value_type'] + " to " + args[0]['value_type'] + "!")
         value_type = args[0]['value_type']
@@ -604,7 +608,13 @@ class Cgen(Transformer):
         return args[0]
 
     def this_exp(self, args):
-        pass
+        code = "# Loading Address of : this\n"
+        code += "li $s6 , 4\n"
+        code += "addi $s6 , $s6 , -4\n"
+        code += "add $s7 , $fp , $s6\n"
+        code += "sw $s7 , 0($sp)\n"
+        code += "addi $sp, $sp, -4\n"
+        return {'code': code, 'value_type': self.classes.classes[self.last_class].name}
 
     def stmt_expr(self, args):
         if len(args) > 0:
@@ -1192,8 +1202,8 @@ class Cgen(Transformer):
         for type in stmt_block['return_type']:
             if type != returnType:
                 raise Exception('this function can not return a ' + type + "!")
-        label_end = "__" + functionName + "_end"
-        code = functionName + ": # Start function\n"
+        label_end = functionName + "_end"
+        code = "__" + functionName + ": # Start function\n"
         code += "addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5\n"
         code += "# Function Body :\n"
         code += stmt_block['code']
@@ -1243,11 +1253,13 @@ class Cgen(Transformer):
     def method_field(self, args):
         cls = self.classes.getMethodByNameAndScope(args[1]['name'], self.scope)
         prefix = cls.name
+        args[1]['code'] = args[1]['code'].replace("li $s6 , 0" , "li $s6 , 4")
         args[1]['code'] = args[1]['code'].replace(args[1]['name'] + "_end:", prefix + "_" + args[1]['name'] + "_end:")
         args[1]['code'] = args[1]['code'].replace(args[1]['name'] + ":", prefix + "_" + args[1]['name'] + ":")
         return args[1]
 
     def class_decl(self, args):
+        self.last_class += 1
         return args[3]
 
     def class_decl_fields(self, args):

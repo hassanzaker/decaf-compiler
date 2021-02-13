@@ -152,7 +152,7 @@ class Classes:
             if cls.name == className:
                 return cls
         else:
-            raise Exception("Class with name " + className + " does not exist!")
+            raise Exception("Class with name " + str(className) + " does not exist!")
 
 
     def getVtables(self):

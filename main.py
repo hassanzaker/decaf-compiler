@@ -3,27 +3,20 @@ from SemanticAnalyser import *
 from CGen import *
 
 text = """
+int test(int a, int b) {
+    return a * b;
+}
 
 int main() {
     int a;
     int b;
-    int i;
 
-    b = 0;
-    for(i = 1; true; i = i + 1) {
-        print("Please enter the #", i, " number:");
-        a = readInteger();
-        if (a < 0){
-            break;
-            }
-            
-            b = a + b;
-           
-       
-    }
+    a = ReadInteger();
+    b = ReadInteger();
 
-    print("Sum of ", i, " items is: ", b);
+    Print(test(a, b));
 }
+
 """
 tree = parse_text(text)
 print(tree)

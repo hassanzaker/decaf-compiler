@@ -60,7 +60,7 @@ def create_parser():
         return_stmt : "return" (expr)? ";" -> return_stmt
         break_stmt : "break" ";" -> break_stmt
         continue_stmt : "continue" ";" -> continue_stmt
-        print_stmt : "print" "(" expr (","expr)* ")" ";" -> print_stmt
+        print_stmt : "Print" "(" expr (","expr)* ")" ";" -> print_stmt
         expr : l_value "=" expr -> expr_assign
             | constant -> expr_constant
             | l_value -> lvalue
@@ -82,8 +82,8 @@ def create_parser():
             | expr "&&" expr -> exp_and_exp
             | expr "||" expr -> exp_or_exp
             | "!" expr -> exp_not
-            | "readInteger" "(" ")" -> read_integer_exp
-            | "readLine" "(" ")" -> read_line_exp
+            | "ReadInteger" "(" ")" -> read_integer_exp
+            | "ReadLine" "(" ")" -> read_line_exp
             | "new" ident -> new_ident_exp
             | "NewArray" "(" expr "," type ")"  -> new_array_exp
             | "itod" "(" expr ")" -> itod_exp
