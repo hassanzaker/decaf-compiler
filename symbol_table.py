@@ -20,6 +20,7 @@ class Function:
 class Symbol_Table:
     def __init__(self):
         self.variables = []
+        self.allVariables = []
         self.functions = []
 
     def addFunction(self, func):
@@ -46,7 +47,9 @@ class Symbol_Table:
             return
 
     def removeFromScop(self, scope):
+        self.allVariables = []
         for var in self.variables:
+            self.allVariables.append(var)
             if var.scope == scope:
                 self.variables.remove(var)
 
@@ -77,7 +80,7 @@ class Symbol_Table:
 
     def getData(self):
         code = ''
-        for var in self.variables:
+        for var in self.allVariables:
             code += var.name + str(var.scope) + " : "
             if var.type == 'double':
                 code += ".float 0.0"

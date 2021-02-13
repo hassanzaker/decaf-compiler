@@ -6,9 +6,11 @@ class Class:
         self.father = None
         self.isDone = False
 
-    def addMethod(self, method):
-        method['scope'] = self.name
+    def addMethod(self, method, scope, formals):
+        method['scope'] = scope
+        method['formals'] = formals
         self.methods.append(method)
+
 
     def addVariable(self, variable):
         variable['scope'] = self.name
@@ -101,8 +103,9 @@ class Class:
         code = ''
         code += self.name + "_vtable:\n"
         for method in self.methods:
-            code += "\t.word " + method['scope'] + "_" + method['name'] + "\n"
+            code += "\t.word " + self.name + "_" + method['name'] + "\n"
         return code
+
 
 
 class Classes:
@@ -123,6 +126,14 @@ class Classes:
                 cls.isDone = True
 
         self.extendClass()
+
+    def getMethodByNameAndScope(self, name, scope):
+        for cls in self.classes:
+            for method in cls.methods:
+                if method['name'] == name and method['scope'] == scope:
+                    return cls
+        else:
+            raise Exception('method not found!')
 
     def extendClass(self):
         for cls in self.classes:

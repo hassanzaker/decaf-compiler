@@ -654,7 +654,7 @@ class Cgen(Transformer):
         code += "sw $s5 , 12($sp)\n"
         code += "# Function Arguments\n"
         code += actuals['code']
-        code += "jal " + str(id) + " # Calling Function\n"
+        code += "jal __" + str(id) + " # Calling Function\n"
         code += "# Pop Arguments of function\n"
         code += "addi $sp , $sp , " + str(actuals['variable_count'] * 4) + "\n"
         code += "# Load Back Frame Pointer and Return Address After Function call\n"
@@ -666,6 +666,65 @@ class Cgen(Transformer):
             code += "s.s $f0 , 4($sp) # Push Return Value from function to Stack\n"
         else:
             code += "sw $v0 , 4($sp) # Push Return Value from function to Stack\n"
+        return {'code': code, 'value_type': value_type}
+
+    def call_class_func(self, args):
+        obj_expr = args[0]
+        function_id = args[1].children[0]
+        object_type = obj_expr['value_type']
+        obj = self.classes.searchClass(object_type)
+        func = obj.getMethods(function_id)
+        actuals = args[2]
+        if (len(actuals['actual_types']) != len(func['formals'])):
+            raise Exception('"function ' + str(function_id) + " has " + str(len(func['formals'])) + " arguments!")
+        size = len(func['formals'])
+        actual_types = actuals['actual_types']
+        for i in range(size):
+            if actual_types[i] != func['formals'][i]:
+                raise Exception('type for calling function is not true!')
+        if object_type[-2:] == "[]" and function_id == 'length':
+            code = "# Array Length\n"
+            code += "# Array Expr\n"
+            code += obj_expr['code']
+            code += "lw $t0 , 4($sp)\n"
+            code += "lw $t0 , 0($t0)\n"
+            code += "sw $t0 , 4($sp) # Pushing length of array to stack\n"
+            return {'code': code, 'value_type': 'int'}
+        if func['access_level'] != "public":
+            raise Exception('can not call this function due to access level!')
+        methodOffset = obj.getMethodOffset(function_id)
+        value_type = obj.getMethods(function_id)['type']
+        code = "# Calling Method of Object\n"
+        code += "# Object Expression\n"
+        code += obj_expr['code']
+        code += "lw $t0 , 4($sp)\n"
+        code += "lw $t0 , 0($t0) # Loading Vtable\n"
+        code += "addi $t0 , $t0 , " + str(methodOffset) + "# Adding offset of Method in Vtable\n"
+        code += "lw $t0 , 0($t0) # t0 now contains the address of function\n"
+        code += "sw $t0 , 0($sp) # Storing Function Address in Stack \n"
+        code += "addi $sp , $sp , -4\n"
+        code += "# Storing Frame Pointer and Return Address Before Calling the object's method : " + function_id + "\n"
+        code += "addi $sp , $sp , -12\n"
+        code += "sw $fp , 4($sp)\n"
+        code += "sw $ra , 8($sp)\n"
+        code += "sw $s5 , 12($sp)\n"
+        code += "# Method\'s Arguments \n"
+        code += actuals['code']
+        code += "lw $t0 , " + str(actuals['variable_count'] * 4 + 12 + 4 + 4) + "($sp) # Loading Object being called\n"
+        code += "sw $t0 , 0($sp) # Pushing object as \"this\" as first argument of method\n"
+        code += "lw $t0 , " + str(actuals['variable_count'] * 4 + 12 + 4) + "($sp) # Loading Method of object\n"
+        code += "addi $sp , $sp , -4\n"
+        code += "jal __" + str(object_type)+ "_" + str(function_id) + " # Calling Object's method\n"
+        code += "addi $sp , $sp , " + str(actuals['variable_count'] * 4 + 4) + " # Pop Arguments of Method\n"
+        code += "# Load Back Frame Pointer and Return Address After Function call\n"
+        code += "lw $fp , 4($sp)\n"
+        code += "lw $ra , 8($sp)\n"
+        code += "lw $s5 , 12($sp)\n"
+        code += "addi $sp , $sp , 16\n"
+        if value_type == 'double':
+            code += "s.s $f0 , 4($sp) # Push Return Value from Method to Stack\n"
+        else:
+            code += "sw $v0 , 4($sp) # Push Return Value from Method to Stack\n"
         return {'code': code, 'value_type': value_type}
 
     def actuals(self, args):
@@ -1049,6 +1108,7 @@ class Cgen(Transformer):
         return {'code': code, 'value_type': 'null_type'}
 
     def func_decl(self, args):
+        self.scope += 1
         returnType = args[0]
         functionName = args[1].children[0]
         formals = args[2]
@@ -1057,7 +1117,10 @@ class Cgen(Transformer):
             if type != returnType:
                 raise Exception('this function can not return a ' + type + "!")
         label_end = functionName + "_end"
-        code = functionName + ": # Start function\n"
+        if functionName == "main":
+            code = functionName + ": # main function\n"
+        else:
+            code = "__" + functionName + ": # Start function\n"
         code += "addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5\n"
         code += "# Function Body :\n"
         code += stmt_block['code']
@@ -1068,6 +1131,7 @@ class Cgen(Transformer):
         return {'code': code, 'name': functionName, 'value_type': returnType}
 
     def func_decl_data_type(self, args):
+        self.scope += 1
         returnType = args[0]
         functionName = args[1].children[0]
         formals = args[2]
@@ -1076,7 +1140,7 @@ class Cgen(Transformer):
             if type != returnType:
                 raise Exception('this function can not return an object of  ' + type + "!")
         label_end = functionName + "_end"
-        code = functionName + ": # Start function\n"
+        code = "__" + functionName + ": # Start function\n"
         code += "addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5\n"
         code += "# Function Body :\n"
         code += stmt_block['code']
@@ -1086,6 +1150,7 @@ class Cgen(Transformer):
         return {'code': code, 'name': functionName, 'value_type': returnType}
 
     def function_void_decl(self, args):
+        self.scope += 1
         returnType = 'void'
         functionName = args[0].children[0]
         formals = args[1]
@@ -1093,7 +1158,7 @@ class Cgen(Transformer):
         for type in stmt_block['return_type']:
             if type != returnType:
                 raise Exception('this function can not return a ' + type + "!")
-        label_end = functionName + "_end"
+        label_end = "__" + functionName + "_end"
         code = functionName + ": # Start function\n"
         code += "addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5\n"
         code += "# Function Body :\n"
@@ -1141,17 +1206,25 @@ class Cgen(Transformer):
     def decl_function_decl(self, args):
         return args[0]
 
-    # def method_field(self, args):
-    #     scope = "func" + str(self.scope)
-    #     args[0]['code'] = args[0]['code'].replace(args[0]['name'] + "_end:", scope + "_" + args[0]['name'] + "_end:")
-    #     args[0]['code'] = args[0]['code'].replace(args[0]['name'] + ":", scope + "_" + args[0]['name'] + ":")
-    #     return args[0]
-    #
+    def method_field(self, args):
+        cls = self.classes.getMethodByNameAndScope(args[1]['name'], self.scope)
+        prefix = cls.name
+        args[1]['code'] = args[1]['code'].replace(args[1]['name'] + "_end:", prefix + "_" + args[1]['name'] + "_end:")
+        args[1]['code'] = args[1]['code'].replace(args[1]['name'] + ":", prefix + "_" + args[1]['name'] + ":")
+        return args[1]
+
     def class_decl(self, args):
+        return args[3]
+
+    def class_decl_fields(self, args):
+        code = ''
+        for arg in args:
+            code += arg['code']
+        return {'code': code}
+
+    def variable_field(self, args):
         return {'code': ''}
 
-    # def class_decl_fields(self, args):
-    #
     # def class_decl_extend(self, args):
     #
     def decl_class_decl(self, args):
