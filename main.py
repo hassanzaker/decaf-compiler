@@ -7,13 +7,14 @@ text = """
 int main() {
     int i;
     i = 0;
-    for(;4<5;)
+    for(i=2;i < 5;i = i +1)
     {
-    if (i == 5){
+    i = i + 1;
+    if (i == 4){
     continue;
     }
     else{
-    print(2);
+    print(i);
     }
     }
     

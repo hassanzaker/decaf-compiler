@@ -52,9 +52,11 @@ def create_parser():
             | return_stmt -> stmt_return_stmt
             | print_stmt -> stmt_print_stmt
             | stmt_block -> stmt_stmt_block
+        expr_opt : expr -> expr_opt 
+         | ->expr_opt_empty
         if_stmt : "if" "(" expr ")" stmt ("else" stmt)? -> if_stmt
         while_stmt : "while" "(" expr ")" stmt -> while_stmt
-        for_stmt: "for" "(" (expr)? ";" expr ";" (expr)? ")" stmt ->for_stmt
+        for_stmt: "for" "(" expr_opt ";" expr ";" expr_opt ")" stmt ->for_stmt
         return_stmt : "return" (expr)? ";" -> return_stmt
         break_stmt : "break" ";" -> break_stmt
         continue_stmt : "continue" ";" -> continue_stmt

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f72968f3-da95-4d80-a7b1-2346417fd40e" name="Default Changelist" comment="add functions for break and continue">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="f72968f3-da95-4d80-a7b1-2346417fd40e" name="Default Changelist" comment="continue_handle">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CGen.py" beforeDir="false" afterPath="$PROJECT_DIR$/CGen.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/Parser.py" afterDir="false" />
@@ -204,6 +203,7 @@
     <MESSAGE value="while added" />
     <MESSAGE value="add for stmt" />
     <MESSAGE value="add functions for break and continue" />
-    <option name="LAST_COMMIT_MESSAGE" value="add functions for break and continue" />
+    <MESSAGE value="continue_handle" />
+    <option name="LAST_COMMIT_MESSAGE" value="continue_handle" />
   </component>
 </project>
