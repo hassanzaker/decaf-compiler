@@ -532,10 +532,10 @@ class Cgen(Transformer):
         obj_type = obj['value_type']
         cls = self.classes.searchClass(obj_type)
         cls_var = cls.getVariable(variable)
-        if cls_var['access_level'] == 'public':
-            var_offset = cls.getVaribaleOffset(variable)
-        else:
-            raise Exception(str(variable) + " is not public!")
+        var_offset = cls.getVaribaleOffset(variable)
+        if not ('this' in obj):
+            if cls_var['access_level'] != 'public':
+                raise Exception(str(variable) + " is not public!")
         code = "# Loading Variable of Object\n"
         code += obj['code']
         code += "lw $t0 , 4($sp)\n"
@@ -609,12 +609,10 @@ class Cgen(Transformer):
 
     def this_exp(self, args):
         code = "# Loading Address of : this\n"
-        code += "li $s6 , 4\n"
-        code += "addi $s6 , $s6 , -4\n"
-        code += "add $s7 , $fp , $s6\n"
+        code += "addi $s7 , $s4 , 0\n"
         code += "sw $s7 , 0($sp)\n"
         code += "addi $sp, $sp, -4\n"
-        return {'code': code, 'value_type': self.classes.classes[self.last_class].name}
+        return {'code': code, 'value_type': self.classes.classes[self.last_class].name, "this": True}
 
     def stmt_expr(self, args):
         if len(args) > 0:
@@ -700,8 +698,9 @@ class Cgen(Transformer):
             code += "lw $t0 , 0($t0)\n"
             code += "sw $t0 , 4($sp) # Pushing length of array to stack\n"
             return {'code': code, 'value_type': 'int'}
-        if func['access_level'] != "public":
-            raise Exception('can not call this function due to access level!')
+        if not('this' in obj_expr):
+            if func['access_level'] != "public":
+                raise Exception('can not call this function due to access level!')
         methodOffset = obj.getMethodOffset(function_id)
         value_type = obj.getMethods(function_id)['type']
         code = "# Calling Method of Object\n"
@@ -722,6 +721,7 @@ class Cgen(Transformer):
         code += actuals['code']
         code += "lw $t0 , " + str(actuals['variable_count'] * 4 + 12 + 4 + 4) + "($sp) # Loading Object being called\n"
         code += "sw $t0 , 0($sp) # Pushing object as \"this\" as first argument of method\n"
+        code += "addi $s4 , $t0 , 0\n"
         code += "lw $t0 , " + str(actuals['variable_count'] * 4 + 12 + 4) + "($sp) # Loading Method of object\n"
         code += "addi $sp , $sp , -4\n"
         code += "jal __" + str(object_type) + "_" + str(function_id) + " # Calling Object's method\n"
@@ -1251,7 +1251,7 @@ class Cgen(Transformer):
         return args[0]
 
     def method_field(self, args):
-        cls = self.classes.getMethodByNameAndScope(args[1]['name'], self.scope)
+        cls = self.classes.getMethodByNameAndScope(args[1]['name'], self.last_class)
         prefix = cls.name
         args[1]['code'] = args[1]['code'].replace("li $s6 , 0" , "li $s6 , 4")
         args[1]['code'] = args[1]['code'].replace(args[1]['name'] + "_end:", prefix + "_" + args[1]['name'] + "_end:")

@@ -3,18 +3,21 @@ from SemanticAnalyser import *
 from CGen import *
 
 text = """
-int test(int a, int b) {
-    return a * b;
+class ali{
+private int x;
+void changeX(int a, int b){
+this.x = a * b;
+}
+int getX(){
+    return this.x;
+}
 }
 
 int main() {
-    int a;
-    int b;
-
-    a = ReadInteger();
-    b = ReadInteger();
-
-    Print(test(a, b));
+    ali a;
+    a = new ali;
+    a.changeX(4 , 5);
+    Print(a.getX());
 }
 
 """

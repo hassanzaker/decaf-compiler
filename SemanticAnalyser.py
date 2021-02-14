@@ -8,6 +8,7 @@ class MyTransformer(Transformer):
         self.scope = 0
         self.classes = Classes()
         self.symbol_table = Symbol_Table()
+        self.last_class = 0
 
     def INT(self, token):
         return 'int'
@@ -62,6 +63,7 @@ class MyTransformer(Transformer):
         return args[0].children[0]
 
     def decl_class_decl(self, args):
+        self.last_class += 1
         self.classes.addClass(args[0])
         return
 
@@ -81,7 +83,7 @@ class MyTransformer(Transformer):
             if cls.doesMethodExist(method['name']):
                 raise Exception(method['name'] + " is defined more than one time!")
             else:
-                cls.addMethod(method, self.scope, method['formals'])
+                cls.addMethod(method, self.last_class, method['formals'])
         return cls
 
 
