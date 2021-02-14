@@ -16,17 +16,26 @@ errorMsg: .asciiz "Semantic Error"
 """
 
 text = """
-class ali{
-int x;
-void changeX(int a, int b){
-this.x = a * b;
-}
-int getX(){
-    return this.x;
-}
-}
+
 int main() {
-    hassan has;
+    int[] a;
+    int[] b;
+    int[] c;
+    int i;
+    int size;
+    a = NewArray(2, int);
+    a[0] = 0;
+    a[1] = 1;
+    b = NewArray(3, int);
+    b[0] = 2;
+    b[1] = 3;
+    b[2] = 4;
+    c = a + b;
+    size = c.length();
+    Print("size: ", size);
+    for(i=0 ; i < size ; i = i+1){
+    Print(c[i]);
+    }
 }
 """
 

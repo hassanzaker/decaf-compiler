@@ -44,7 +44,7 @@ class Cgen(Transformer):
             self.builtin_functions.append('str_concat')
             code += "lw $a0 , 8($sp)\n"
             code += "lw $a1 , 4($sp)\n"
-            code += "la $a2, __result"
+            code += "la $a2, __result\n"
             code += "addi $sp , $sp , -8\n"
             code += "sw $fp , 8($sp)\n"
             code += "sw $ra , 4($sp)\n"
@@ -54,7 +54,27 @@ class Cgen(Transformer):
             code += "addi $sp , $sp , 8\n"
             code += "la $t0, __result\n"
             code += "sw $t0 , 8($sp) \n"
-        # TODO --> append two string (or array) when we want to add them
+        elif value_type1[len(value_type1)-2:len(value_type1)] == '[]' and value_type2 == value_type1:
+            self.builtin_functions.append('array_concat')
+            code += "lw $t0 , 8($sp)\n"
+            code += "lw $t1 , 4($sp)\n"
+            code += "lw $s0 , 0($t0)\n"
+            code += "lw $s1 , 0($t1)\n"
+            code += "add $s3 , $s0 , $s1      #size of concat array\n  "
+            code += "move $a0 , $t0\n"
+            code += "move $a1 , $t1\n"
+            code += "la $t2, __result\n"
+            code += "sw $s3 , 0($t2)          #size \n"
+            code += "addi $a2 , $t2, 4\n"
+            code += "addi $sp , $sp , -8\n"
+            code += "sw $fp , 8($sp)\n"
+            code += "sw $ra , 4($sp)\n"
+            code += "jal arraycat # Calling Function to concatenation of two Strings\n"
+            code += "lw $fp , 8($sp)\n"
+            code += "lw $ra , 4($sp)\n"
+            code += "addi $sp , $sp , 8\n"
+            code += "la $t0, __result\n"
+            code += "sw $t0 , 8($sp) \n"
         else:
             raise Exception("Can Not Add " + value_type1 + " to " + value_type2 + "!")
         code += "addi $sp , $sp , 4\n"
@@ -681,7 +701,7 @@ class Cgen(Transformer):
         obj_expr = args[0]
         function_id = args[1].children[0]
         object_type = obj_expr['value_type']
-        if object_type[-2:] == "[]" and function_id == 'length':
+        if object_type[len(object_type)-2:len(object_type)] == "[]" and function_id == 'length':
             code = "# Array Length\n"
             code += "# Array Expr\n"
             code += obj_expr['code']
@@ -689,6 +709,7 @@ class Cgen(Transformer):
             code += "lw $t0 , 0($t0)\n"
             code += "sw $t0 , 4($sp) # Pushing length of array to stack\n"
             return {'code': code, 'value_type': 'int'}
+
         obj = self.classes.searchClass(object_type)
         func = obj.getMethods(function_id)
         actuals = args[2]
