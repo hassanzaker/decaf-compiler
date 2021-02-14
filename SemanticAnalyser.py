@@ -84,6 +84,7 @@ class MyTransformer(Transformer):
                 raise Exception(method['name'] + " is defined more than one time!")
             else:
                 cls.addMethod(method, self.last_class, method['formals'])
+                cls.addDefinedFunction(method, self.last_class, method['formals'])
         return cls
 
 

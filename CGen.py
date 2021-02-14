@@ -637,6 +637,7 @@ class Cgen(Transformer):
 
     def stmt_expr(self, args):
         if len(args) > 0:
+            print(args[0])
             code = args[0]['code']
             code += "# End of Expression Optional\n"
             code += "addi $sp , $sp 4\n"
@@ -711,7 +712,18 @@ class Cgen(Transformer):
             return {'code': code, 'value_type': 'int'}
 
         obj = self.classes.searchClass(object_type)
-        func = obj.getMethods(function_id)
+        func = func = obj.getMethods(function_id)
+        flag = False
+        while (obj.father is not None) and (func is None):
+            obj = obj.father
+            flag = True
+            func = obj.getMethods(function_id, True)
+            print(obj.name)
+            print("2 -- >")
+            print(func)
+        if func is None:
+            raise Exception('method ' + function_id + " does not exist in class " + object_type + "!")
+        value_type = func['type']
         actuals = args[2]
         if (len(actuals['actual_types']) != len(func['formals'])):
             raise Exception('"function ' + str(function_id) + " has " + str(len(func['formals'])) + " arguments!")
@@ -721,10 +733,10 @@ class Cgen(Transformer):
             if actual_types[i] != func['formals'][i]:
                 raise Exception('type for calling function is not true!')
         if not('this' in obj_expr):
-            if func['access_level'] != "public":
+            if flag and (func['access_level'] == "private"):
                 raise Exception('can not call this function due to access level!')
         methodOffset = obj.getMethodOffset(function_id)
-        value_type = obj.getMethods(function_id)['type']
+
         code = "# Calling Method of Object\n"
         code += "# Object Expression\n"
         code += obj_expr['code']
@@ -746,7 +758,8 @@ class Cgen(Transformer):
         code += "addi $s4 , $t0 , 0\n"
         code += "lw $t0 , " + str(actuals['variable_count'] * 4 + 12 + 4) + "($sp) # Loading Method of object\n"
         code += "addi $sp , $sp , -4\n"
-        code += "jal __" + str(object_type) + "_" + str(function_id) + " # Calling Object's method\n"
+        print()
+        code += "jal __" + str(obj.name) + "_" + str(function_id) + " # Calling Object's method\n"
         code += "addi $sp , $sp , " + str(actuals['variable_count'] * 4 + 4) + " # Pop Arguments of Method\n"
         code += "# Load Back Frame Pointer and Return Address After Function call\n"
         code += "lw $fp , 4($sp)\n"

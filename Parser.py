@@ -84,7 +84,7 @@ def create_parser():
             | "!" expr -> exp_not
             | "ReadInteger" "(" ")" -> read_integer_exp
             | "ReadLine" "(" ")" -> read_line_exp
-            | "new" ident -> new_ident_exp
+            | "New" ident -> new_ident_exp
             | "NewArray" "(" expr "," type ")"  -> new_array_exp
             | "itod" "(" expr ")" -> itod_exp
             | "dtoi" "(" expr ")" -> dtoi_exp

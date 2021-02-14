@@ -3,6 +3,7 @@ class Class:
         self.name = name
         self.variables = []
         self.methods = []
+        self.definedFunctions = []
         self.father = None
         self.isDone = False
 
@@ -11,6 +12,10 @@ class Class:
         method['formals'] = formals
         self.methods.append(method)
 
+    def addDefinedFunction(self, method, scope, formals):
+        method['scope'] = scope
+        method['formals'] = formals
+        self.definedFunctions.append(method)
 
     def addVariable(self, variable):
         variable['scope'] = self.name
@@ -48,11 +53,14 @@ class Class:
                 return var
         raise Exception("Variable ( " + varName + " ) fot found !!!")
 
-    def getMethods(self, methodName):
-        for method in self.methods:
-            if method['name'] == methodName:
-                return method
-        raise Exception("Method ( " + methodName + " ) fot found !!!")
+    def getMethods(self, methodName, flag = False):
+        for method in self.definedFunctions:
+            if method['name'] == methodName :
+                if flag and method['access_level'] == 'private':
+                    raise Exception('method ' + methodName + " does not exist in this class !")
+                else:
+                    return method
+        return None
 
     def extendClass(self):
         if not self.isDone:
