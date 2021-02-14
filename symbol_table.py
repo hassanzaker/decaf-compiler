@@ -62,9 +62,10 @@ class Symbol_Table:
     def getVariable(self, name, scope):
         counter = 0
         for var in self.variables:
-            if var.name == name and var.scope == scope:
-                return (var, counter * 4)
-            counter += 1
+            if var.scope == scope:
+                counter += 1
+                if var.name == name and var.scope == scope:
+                    return (var, counter * 4)
         counter = 0
         for var in self.variables:
             if var.name == name and var.scope > scope:

@@ -17,6 +17,9 @@ readInteger:
     lb $t1 , 0($a0)
     beq $t1 , $zero , read_line_end # if letter == '\0'
     addi $t1 , $t1 , -48 # letter - '0'
+    li $s3 , 9
+    sgt $s2 , $t1 , $s3
+    beq $s2 , 1 , read_line_zero
     mul $v0 , $v0 , $t3 # prev = prev * 10 + ( letter - '0' )
     add $v0 , $v0 , $t1
     addi $a0 , $a0 , 1
@@ -32,6 +35,6 @@ readInteger:
     li $t8 , -1
     addi $a0 , $a0 , 1
     j start_calculations_read_integer
-
+    read_line_zero:
     li $v0, 0
     jr $ra

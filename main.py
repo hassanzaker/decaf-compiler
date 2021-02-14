@@ -16,26 +16,19 @@ errorMsg: .asciiz "Semantic Error"
 """
 
 text = """
-class Ali{
- int q;
-
-    
- public void changeA(int a){
-    this.q = a * a;
-    Print(this.q);
- }
- int setA(int x, int y){
-    Print(y);
-    }
-}
-// class Baba extends Ali{}
 int main() {
-    Ali ali;
-    ali = New Ali;
-        ali.setA(5, 7);
-
-    ali.changeA(1);
-    Print(ali.q);
+    int a;
+    int b;
+    int c;
+    int d;
+    a = ReadInteger();
+    b = ReadInteger();
+    c = ReadInteger();
+    d = ReadInteger();
+    
+    Print(a, " ", b, " " , c, " " , d);
+    
+    
     
 }
 """
