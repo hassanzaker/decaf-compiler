@@ -18,7 +18,7 @@ class Cgen(Transformer):
         self.stack = []
         self.last_class = 0
 
-    def log_code(self, code):
+    def write_code_in_file(self, code):
         dirname = os.path.dirname(__file__)
         file = open(dirname + "/result.s", "w")
         file.write(code)
@@ -505,6 +505,7 @@ class Cgen(Transformer):
         return {'type': args[0], 'name': args[1].children[0]}
 
     def variable_type_class(self, args):
+        self.classes.searchClass(args[0].value)
         return {'type': args[0].value, 'name': args[1].children[0]}
 
     def variable_decl(self, args):
@@ -624,8 +625,8 @@ class Cgen(Transformer):
             return {'code': '', "break_labels": [], 'continue_labels': []}
 
     def new_array_exp(self, args):
-        if args[0]['value_type'] != 'int':
-            raise Exception('first argument should be int!')
+        # if args[0]['value_type'] != 'int':
+        #     raise Exception('first argument should be int!')
         code = "# Expression of Array Size\n"
         code += args[0]['code']
         code += "# NewArray of Type : " + args[1] + "\n"
@@ -680,6 +681,14 @@ class Cgen(Transformer):
         obj_expr = args[0]
         function_id = args[1].children[0]
         object_type = obj_expr['value_type']
+        if object_type[-2:] == "[]" and function_id == 'length':
+            code = "# Array Length\n"
+            code += "# Array Expr\n"
+            code += obj_expr['code']
+            code += "lw $t0 , 4($sp)\n"
+            code += "lw $t0 , 0($t0)\n"
+            code += "sw $t0 , 4($sp) # Pushing length of array to stack\n"
+            return {'code': code, 'value_type': 'int'}
         obj = self.classes.searchClass(object_type)
         func = obj.getMethods(function_id)
         actuals = args[2]
@@ -690,14 +699,6 @@ class Cgen(Transformer):
         for i in range(size):
             if actual_types[i] != func['formals'][i]:
                 raise Exception('type for calling function is not true!')
-        if object_type[-2:] == "[]" and function_id == 'length':
-            code = "# Array Length\n"
-            code += "# Array Expr\n"
-            code += obj_expr['code']
-            code += "lw $t0 , 4($sp)\n"
-            code += "lw $t0 , 0($t0)\n"
-            code += "sw $t0 , 4($sp) # Pushing length of array to stack\n"
-            return {'code': code, 'value_type': 'int'}
         if not('this' in obj_expr):
             if func['access_level'] != "public":
                 raise Exception('can not call this function due to access level!')
@@ -1300,5 +1301,5 @@ class Cgen(Transformer):
         self.data_code += "str_bool : .word str_false , str_true\n"
         self.data_code += "obj_null : .word 61235\n"
         self.data_code += "__result: .space 200\n"
-        self.log_code(code + "\n\n.data\n" + self.data_code)
+        self.write_code_in_file(code + "\n\n.data\n" + self.data_code)
         return args
