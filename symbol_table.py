@@ -81,7 +81,7 @@ class Symbol_Table:
 
     def getData(self):
         code = ''
-        for var in self.allVariables:
+        for var in self.variables:
             code += var.name + str(var.scope) + " : "
             if var.type == 'double':
                 code += ".float 0.0"

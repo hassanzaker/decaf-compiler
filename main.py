@@ -18,22 +18,50 @@ errorMsg: .asciiz "Semantic Error"
 text = """
 class Ali{
  int x;
- void f(){
+ void f(int e, int f){
   Print(this.x);
+  Print(e , f);
  }
- void g(){
+ void g(int g){
   Print(this.x);
+  Print(g);
+ }
+ 
+ void h(int r){
+  Print(this.x);
+  Print(r);
+ }
+}
+
+class Hassan{
+ int x;
+ void f(int e){
+  Print(this.x);
+  Print(e);
+ }
+ void g(int g){
+  Print(this.x);
+  Print(g);
+ }
+ 
+ void h(int r){
+  Print(this.x);
+  Print(r);
  }
 }
 int main() {
     Ali a;
+    Hassan b;
     a = New Ali;
+    b = New Hassan;
     a.x = 7;
-    a.f();
-    a.g();
-    
-    
-    
+    a.f(33, 2);
+    a.g(44);
+    a.h(55);
+    b.x = 13;
+    b.f(3);
+    b.g(4);
+    b.h(5);
 }
 """
 

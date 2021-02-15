@@ -554,7 +554,7 @@ class Cgen(Transformer):
     def lvalue_id(self, args):
         name = args[0].children[0].value
         var, address = self.symbol_table.getVariable(name, self.scope)
-        code = "# Loading Address of ID : " + var.name + "\n"
+        code = "# Loading Address of ID : " + var.name + str(var.scope) + "\n"
         code += "li $s6 , 0\n"
         code += "addi $s6 , $s6 , " + str(address) + "\n"
         code += "add $s7 , $fp , $s6\n"
@@ -654,7 +654,6 @@ class Cgen(Transformer):
 
     def stmt_expr(self, args):
         if len(args) > 0:
-            print(args[0])
             code = args[0]['code']
             code += "# End of Expression Optional\n"
             code += "addi $sp , $sp 4\n"
@@ -735,9 +734,6 @@ class Cgen(Transformer):
             obj = obj.father
             flag = True
             func = obj.getMethods(function_id, True)
-            print(obj.name)
-            print("2 -- >")
-            print(func)
         if func is None:
             raise Exception('method ' + function_id + " does not exist in class " + object_type + "!")
         value_type = func['type']
@@ -775,7 +771,6 @@ class Cgen(Transformer):
         code += "addi $s4 , $t0 , 0\n"
         code += "lw $t0 , " + str(actuals['variable_count'] * 4 + 12 + 4) + "($sp) # Loading Method of object\n"
         code += "addi $sp , $sp , -4\n"
-        print()
         code += "jal __" + str(obj.name) + "_" + str(function_id) + " # Calling Object's method\n"
         code += "addi $sp , $sp , " + str(actuals['variable_count'] * 4 + 4) + " # Pop Arguments of Method\n"
         code += "# Load Back Frame Pointer and Return Address After Function call\n"
@@ -928,7 +923,9 @@ class Cgen(Transformer):
             variable_count * 4) + " # UnAllocate Stack Area (Removing Block Statement Variables)\n"
         code += "addi $fp ,$sp , 4\n"
         code += "# End of Statement Block\n"
-        self.symbol_table.removeFromScop(self.scope)
+        # print(self.symbol_table.variables)
+        # self.symbol_table.removeFromScop(self.scope)
+        # print(self.symbol_table.variables)
         return_types = list(set(return_types))
         return {'code': code, 'break_labels': break_labels, 'continue_labels': continue_labels,
                 'return_type': return_types}
