@@ -121,6 +121,9 @@ class Classes:
         self.classes = []
 
     def addClass(self, class_type):
+        for cls in self.classes:
+            if class_type.name == cls.name:
+                raise Exception("class with name " + class_type.name + " already exists!")
         self.classes.append(class_type)
 
     # should be call after all classes have been defined and added to Classe list

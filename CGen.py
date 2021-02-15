@@ -584,6 +584,8 @@ class Cgen(Transformer):
     def get_array_item(self, args):
         base_arr = args[0]
         index = args[1]
+        if index['value_type'] != 'int':
+            raise Exception('index should be int!')
         code = "# Get Array index\n"
         code += "# Base Address of Array\n"
         code += base_arr['code']
@@ -607,7 +609,6 @@ class Cgen(Transformer):
         return args[0]
 
     def expr_assign(self, args):
-
         if args[0]['value_type'] != args[1]['value_type']:
             raise Exception("can not assign " + args[1]['value_type'] + " to " + args[0]['value_type'] + "!")
         value_type = args[0]['value_type']

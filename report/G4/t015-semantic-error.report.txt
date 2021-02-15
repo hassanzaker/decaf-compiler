@@ -1,1 +1,1 @@
-different line count in these files! : file out/G4/t015-semantic-error.out : #2 , file tests/G4/t015-semantic-error.out : #1 
+OK 

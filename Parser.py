@@ -1,4 +1,3 @@
-
 from lark import Lark
 from SemanticAnalyser import MyTransformer
 import pprint
@@ -14,22 +13,22 @@ def create_parser():
         variable_decl : variable ";" -> variable_decl
         variable : type ident -> variable_type_primitive
             | ident_type ident -> variable_type_class
-            
+
         type: "int" -> type_int
             | "double" -> type_double
             | "bool" -> type_bool
             | "string" -> type_string
             | type "[]" -> type_array
-            
+
         ident_type : ident -> type_id
-        
+
         function_decl : type ident "(" formals ")" stmt_block -> func_decl
             | ident_type ident "(" formals ")" stmt_block -> func_decl_data_type
             | "void" ident "(" formals ")" stmt_block -> function_void_decl
-            
+
         formals : variable ("," variable)* -> formals
             |  -> formals_empty
-            
+
         class_decl : "class" ident class_extend  class_implement class_fields -> class_decl
         class_extend : ("extends" ident)? -> class_decl_extend
         class_implement : ("implements" ident ("," ident)*)?
@@ -96,7 +95,7 @@ def create_parser():
             | "dtoi" "(" expr ")" -> dtoi_exp
             | "itob" "(" expr ")" -> itob_exp
             | "btoi" "(" expr ")" -> btoi_exp
-            
+
         l_value : ident -> lvalue_id
             | expr "." ident -> get_class_variable
             | expr "[" expr "]" -> get_array_item
@@ -104,14 +103,13 @@ def create_parser():
             | expr "." ident "(" actuals ")" -> call_class_func
         actuals : expr ("," expr)* -> actuals
             | -> actual_empty
-        
+
         constant : INT -> constant_int
             | DOUBLE -> constant_double
             | DOUBLE_SCI -> constant_double2
             | BOOL -> constant_bool
             |  STRING -> constant_string
             | "null" -> constant_null
-
         DOUBLE.2 : /(\\d)+\\.(\\d)*/
         DOUBLE_SCI.3 : /(\\d)+\\.(\\d)*[Ee][+-]?(\\d)+/
         INT: /0[xX][a-fA-F0-9]+/ | /[0-9]+/
