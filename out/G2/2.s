@@ -39,6 +39,18 @@ addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5
 # Begin of Statement Block
 addi $sp , $sp , -0 # Allocate From Stack For Block Statement Variables
 addi $fp , $sp , 4
+# String Constant : "input your name:"
+la $t0 , str0
+sw $t0 , 0($sp)
+addi $sp , $sp , -4
+# Print expr : 
+addi $sp , $sp , 4 # Pop Expression of Print
+lw $a0 , 0($sp)
+li $v0 , 4
+syscall
+li $v0 , 4
+la $a0 , new_line
+syscall
 # Read Line : 
 addi $sp , $sp , -8
 sw $fp , 8($sp)
@@ -66,6 +78,7 @@ jr $ra
 
 
 .data
+str0: .asciiz "input your name:"
 str_false : .asciiz "false" 
 str_true : .asciiz "true" 
 new_line : .asciiz "

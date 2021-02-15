@@ -1,84 +1,33 @@
-from Parser import *
-from SemanticAnalyser import *
-from CGen import *
-semanticError = """
-.text
-.globl main
+import sys, getopt
+from controller import *
+def main(argv):
+    inputfile = ''
+    outputfile = ''
+    data = ''
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
+    except getopt.GetoptError:
+        print ('main.py -i <inputfile> -o <outputfile>')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print ('test.py -i <inputfile> -o <outputfile>')
+            sys.exit()
+        elif opt in ("-i", "--ifile"):
+            inputfile = arg
+        elif opt in ("-o", "--ofile"):
+            outputfile = arg
 
-main:
-la $a0 , errorMsg
-addi $v0 , $zero, 4
-syscall
-jr $ra
+    with open("tests/" + inputfile, "r") as input_file:
+        text = input_file.read()
+        data = start(text)
+        pass
 
-.data
-errorMsg: .asciiz "Semantic Error"
-"""
-
-text = """
-class Ali{
- int x;
- void f(int e, int f){
-  Print(this.x);
-  Print(e , f);
- }
- void g(int g){
-  Print(this.x);
-  Print(g);
- }
- 
- void h(int r){
-  Print(this.x);
-  Print(r);
- }
-}
-
-class Hassan{
- int x;
- void f(int e){
-  Print(this.x);
-  Print(e);
- }
- void g(int g){
-  Print(this.x);
-  Print(g);
- }
- 
- void h(int r){
-  Print(this.x);
-  Print(r);
- }
-}
-int main() {
-    Ali a;
-    Hassan b;
-    a = New Ali;
-    b = New Hassan;
-    a.x = 7;
-    a.f(33, 2);
-    a.g(44);
-    a.h(55);
-    b.x = 13;
-    b.f(3);
-    b.g(4);
-    b.h(5);
-}
-"""
+    with open("out/" + outputfile, "w") as output_file:
+        # write result to output file.
+        # for the sake of testing :
+        output_file.write(data)
 
 
-
-tree = parse_text(text)
-print(tree)
-a = MyTransformer()
-a.transform(tree)
-b = Cgen(a.classes, a.symbol_table).transform(tree)
-
-# try:
-#     a.transform(tree)
-#     b = Cgen(a.classes, a.symbol_table).transform(tree)
-# except:
-#     dirname = os.path.dirname(__file__)
-#     file = open(dirname + "/result.s", "w")
-#     file.write(semanticError)
-#     file.close()
-#
+if __name__ == "__main__":
+    main(sys.argv[1:])

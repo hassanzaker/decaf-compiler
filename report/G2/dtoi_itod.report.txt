@@ -1,0 +1,1 @@
+difference in line #1: file: out/G2/dtoi_itod.out -----> content: Semantic Error <> file: tests/G2/dtoi_itod.out -----> content: true 

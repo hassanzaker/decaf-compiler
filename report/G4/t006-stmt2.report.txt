@@ -1,0 +1,1 @@
+difference in line #1: file: out/G4/t006-stmt2.out -----> content: -177843584 <> file: tests/G4/t006-stmt2.out -----> content: 54 

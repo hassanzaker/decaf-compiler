@@ -1,0 +1,1 @@
+difference in line #1: file: out/G3/read_int.out -----> content: 123415 <> file: tests/G3/read_int.out -----> content: 12345 

@@ -1349,5 +1349,4 @@ class Cgen(Transformer):
         self.data_code += "str_bool : .word str_false , str_true\n"
         self.data_code += "obj_null : .word 61235\n"
         self.data_code += "__result: .space 200\n"
-        self.write_code_in_file(code + "\n\n.data\n" + self.data_code)
-        return args
+        return code + "\n\n.data\n" + self.data_code

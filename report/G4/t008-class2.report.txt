@@ -1,0 +1,1 @@
+different line count in these files! : file out/G4/t008-class2.out : #1 , file tests/G4/t008-class2.out : #11 
