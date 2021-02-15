@@ -24,6 +24,23 @@ class Cgen(Transformer):
         file.write(code)
         file.close()
 
+    def aexp(self, args):
+        return args[0]
+
+    def bexp(self, args):
+        return args[0]
+
+    def cexp(self, args):
+        return args[0]
+
+    def dexp(self, args):
+        return args[0]
+
+    def eexp(self, args):
+        return args[0]
+
+    def fexp(self, args):
+        return args[0]
     ########### Arethmatic ###############
 
     def exp_plus_exp(self, args):

@@ -16,17 +16,21 @@ errorMsg: .asciiz "Semantic Error"
 """
 
 text = """
+class Ali{
+ int x;
+ void f(){
+  Print(this.x);
+ }
+ void g(){
+  Print(this.x);
+ }
+}
 int main() {
-    int a;
-    int b;
-    int c;
-    int d;
-    a = ReadInteger();
-    b = ReadInteger();
-    c = ReadInteger();
-    d = ReadInteger();
-    
-    Print(a, " ", b, " " , c, " " , d);
+    Ali a;
+    a = New Ali;
+    a.x = 7;
+    a.f();
+    a.g();
     
     
     

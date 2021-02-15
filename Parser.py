@@ -62,26 +62,32 @@ def create_parser():
         continue_stmt : "continue" ";" -> continue_stmt
         print_stmt : "Print" "(" expr (","expr)* ")" ";" -> print_stmt
         expr : l_value "=" expr -> expr_assign
-            | constant -> expr_constant
-            | l_value -> lvalue
-            | "this"  -> this_exp
-            | call -> call_expr
-            | "(" expr ")" -> exp_inside_parenthesis
-            | expr "+" expr -> exp_plus_exp
-            | expr "-" expr -> exp_minus_exp
-            | expr "*" expr -> exp_mul_exp
-            | expr "/" expr -> exp_div_exp
-            | expr "%" expr -> exp_mod_exp
-            | "-" expr -> exp_negative
-            | expr "<" expr -> exp_less_exp 
+            | aexp -> aexp
+        aexp: expr "<" expr -> exp_less_exp 
             | expr "<=" expr -> exp_less_equal_exp
             | expr ">" expr -> exp_greater_exp
             | expr ">=" expr -> exp_greater_equal_exp
             | expr "==" expr -> exp_equal_exp
             | expr "!=" expr -> exp_not_equal_exp 
-            | expr "&&" expr -> exp_and_exp
+            | bexp -> bexp
+        bexp: expr "&&" expr -> exp_and_exp
             | expr "||" expr -> exp_or_exp
+            | expr "%" expr -> exp_mod_exp
+            | cexp -> cexp
+        cexp: expr "+" expr -> exp_plus_exp
+            | expr "-" expr -> exp_minus_exp
+            | dexp -> dexp
+        dexp: expr "*" expr -> exp_mul_exp
+            | expr "/" expr -> exp_div_exp
+            | eexp -> eexp
+        eexp: "-" expr -> exp_negative           
             | "!" expr -> exp_not
+            | fexp -> fexp
+        fexp: constant -> expr_constant
+            | l_value -> lvalue
+            | "this"  -> this_exp
+            | call -> call_expr
+            | "(" expr ")" -> exp_inside_parenthesis            
             | "ReadInteger" "(" ")" -> read_integer_exp
             | "ReadLine" "(" ")" -> read_line_exp
             | "New" ident -> new_ident_exp
