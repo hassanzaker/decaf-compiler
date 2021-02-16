@@ -3,6 +3,7 @@ import sys
 from Parser import *
 from SemanticAnalyser import *
 from CGen import *
+from FormFunctions import *
 semanticError = """
 .text
 .globl main
@@ -72,7 +73,7 @@ def start(data):
     a = MyTransformer()
     if str(tree) == 'Syntax Error':
         print(tree)
-
+    tree = FormFunctions().transform(tree)
     try:
         a.transform(tree)
         b = Cgen(a.classes, a.symbol_table).transform(tree)
@@ -81,33 +82,24 @@ def start(data):
         return semanticError
 
 
-text = """
-
-int main() {
-    int a;
-    int b;
-    int c;
-    int d;
-
-    int z;
-
-    a = ReadInteger();
-    b = ReadInteger();
-    c = ReadInteger();
-    d = ReadInteger();
-
-    z = a + b * c - d;
-
-    Print(z);
-}
-"""
-
-tree = parse_text(text)
-a = MyTransformer()
-if str(tree) == 'Syntax Error':
-    print(tree)
-
-
-a.transform(tree)
-b = Cgen(a.classes, a.symbol_table).transform(tree)
-print(b)
+# text = """
+# int dsaa() {
+#     string name;
+# }
+#
+# int main() {
+#
+# }
+# """
+#
+# tree = parse_text(text)
+# print(tree)
+# tree = FormFunctions().transform(tree)
+# print(tree)
+# a = MyTransformer()
+# if str(tree) == 'Syntax Error':
+#     print(tree)
+#
+# a.transform(tree)
+# b = Cgen(a.classes, a.symbol_table).transform(tree)
+# print(b)

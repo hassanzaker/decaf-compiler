@@ -62,22 +62,22 @@ def create_parser():
         print_stmt : "Print" "(" expr (","expr)* ")" ";" -> print_stmt
         expr : l_value "=" expr -> expr_assign
             | aexp -> aexp
-        aexp: expr "<" expr -> exp_less_exp 
-            | expr "<=" expr -> exp_less_equal_exp
-            | expr ">" expr -> exp_greater_exp
-            | expr ">=" expr -> exp_greater_equal_exp
-            | expr "==" expr -> exp_equal_exp
-            | expr "!=" expr -> exp_not_equal_exp 
+        aexp: bexp "<" expr -> exp_less_exp 
+            | bexp "<=" expr -> exp_less_equal_exp
+            | bexp ">" expr -> exp_greater_exp
+            | bexp ">=" expr -> exp_greater_equal_exp
+            | bexp "==" expr -> exp_equal_exp
+            | bexp "!=" expr -> exp_not_equal_exp 
             | bexp -> bexp
-        bexp: expr "&&" expr -> exp_and_exp
-            | expr "||" expr -> exp_or_exp
-            | expr "%" expr -> exp_mod_exp
+        bexp: cexp "&&" expr -> exp_and_exp
+            | cexp "||" expr -> exp_or_exp
+            | cexp "%" expr -> exp_mod_exp
             | cexp -> cexp
-        cexp: expr "+" expr -> exp_plus_exp
-            | expr "-" expr -> exp_minus_exp
+        cexp: dexp "+" expr -> exp_plus_exp
+            | dexp "-" expr -> exp_minus_exp
             | dexp -> dexp
-        dexp: expr "*" expr -> exp_mul_exp
-            | expr "/" expr -> exp_div_exp
+        dexp: eexp "*" expr -> exp_mul_exp
+            | eexp "/" expr -> exp_div_exp
             | eexp -> eexp
         eexp: "-" expr -> exp_negative           
             | "!" expr -> exp_not
@@ -89,7 +89,7 @@ def create_parser():
             | "(" expr ")" -> exp_inside_parenthesis            
             | "ReadInteger" "(" ")" -> read_integer_exp
             | "ReadLine" "(" ")" -> read_line_exp
-            | "New" ident -> new_ident_exp
+            | "new" ident -> new_ident_exp
             | "NewArray" "(" expr "," type ")"  -> new_array_exp
             | "itod" "(" expr ")" -> itod_exp
             | "dtoi" "(" expr ")" -> dtoi_exp

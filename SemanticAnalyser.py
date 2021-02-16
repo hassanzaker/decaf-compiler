@@ -2,7 +2,6 @@ from lark import Lark, Transformer, Tree
 from ClassTable import Classes, Class
 from symbol_table import Symbol, Symbol_Table, Function
 
-arr=[]
 class MyTransformer(Transformer):
     def __init__(self):
         self.scope = 0
@@ -19,7 +18,6 @@ class MyTransformer(Transformer):
     def STRING(self, token):
         return 'str'
     def BOOL(self, token):
-        arr.append(token)
         return 'bool'
     def constant(self, value):
         if len(value) == 0:

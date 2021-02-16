@@ -74,6 +74,182 @@ readInteger:
     jr $ra
 
 
+__abs_mult: # Start function
+addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5
+# Function Body :
+# Begin of Statement Block
+addi $sp , $sp , -4 # Allocate From Stack For Block Statement Variables
+addi $fp , $sp , 4
+# Loading Address of ID : a2
+li $s6 , 0
+addi $s6 , $s6 , 4
+add $s7 , $fp , $s6
+sw $s7, 0($sp) # Push Address of 4 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Loading Address of ID : b2
+li $s6 , 0
+addi $s6 , $s6 , 8
+add $s7 , $fp , $s6
+sw $s7, 0($sp) # Push Address of 8 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# greater than Expression
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+sgt $t0 , $t0 , $t1
+sw $t0 , 8($sp)
+addi $sp , $sp , 4
+addi $sp , $sp , 4
+lw $t0 , 0($sp)
+beq $t0 , $zero , label0
+# Left Hand Side Assign
+# Loading Address of ID : c1
+li $s6 , 0
+addi $s6 , $s6 , 0
+add $s7 , $fp , $s6
+sw $s7, 0($sp) # Push Address of 0 to Stack
+addi $sp, $sp, -4
+# Right Hand Side Assign
+# Loading Address of ID : a2
+li $s6 , 0
+addi $s6 , $s6 , 4
+add $s7 , $fp , $s6
+sw $s7, 0($sp) # Push Address of 4 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Loading Address of ID : b2
+li $s6 , 0
+addi $s6 , $s6 , 8
+add $s7 , $fp , $s6
+sw $s7, 0($sp) # Push Address of 8 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# minus Expression
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+sub $t0 , $t0 , $t1
+sw $t0 , 8($sp)
+addi $sp , $sp , 4
+# Assign Right Side to Left
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+sw $t1 , 0($t0)
+sw $t1 , 8($sp)
+addi $sp , $sp , 4
+# End of Expression Optional
+addi $sp , $sp 4
+j label1
+label0 :
+# Left Hand Side Assign
+# Loading Address of ID : c1
+li $s6 , 0
+addi $s6 , $s6 , 0
+add $s7 , $fp , $s6
+sw $s7, 0($sp) # Push Address of 0 to Stack
+addi $sp, $sp, -4
+# Right Hand Side Assign
+# Loading Address of ID : b2
+li $s6 , 0
+addi $s6 , $s6 , 8
+add $s7 , $fp , $s6
+sw $s7, 0($sp) # Push Address of 8 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Loading Address of ID : a2
+li $s6 , 0
+addi $s6 , $s6 , 4
+add $s7 , $fp , $s6
+sw $s7, 0($sp) # Push Address of 4 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# minus Expression
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+sub $t0 , $t0 , $t1
+sw $t0 , 8($sp)
+addi $sp , $sp , 4
+# Assign Right Side to Left
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+sw $t1 , 0($t0)
+sw $t1 , 8($sp)
+addi $sp , $sp , 4
+# End of Expression Optional
+addi $sp , $sp 4
+label1 :
+#End of if statement
+# Loading Address of ID : c1
+li $s6 , 0
+addi $s6 , $s6 , 0
+add $s7 , $fp , $s6
+sw $s7, 0($sp) # Push Address of 0 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Loading Address of ID : a2
+li $s6 , 0
+addi $s6 , $s6 , 4
+add $s7 , $fp , $s6
+sw $s7, 0($sp) # Push Address of 4 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# Loading Address of ID : b2
+li $s6 , 0
+addi $s6 , $s6 , 8
+add $s7 , $fp , $s6
+sw $s7, 0($sp) # Push Address of 8 to Stack
+addi $sp, $sp, -4
+# loading address of lvalue
+lw $t0, 4($sp)
+lw $t0 , 0($t0)
+sw $t0 , 4($sp)
+# div Expression
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+mul $t0 , $t0 , $t1
+sw $t0 , 8($sp)
+addi $sp , $sp , 4
+# div Expression
+lw $t0 , 8($sp)
+lw $t1 , 4($sp)
+mul $t0 , $t0 , $t1
+sw $t0 , 8($sp)
+addi $sp , $sp , 4
+lw $v0 , 4($sp) # Loading Return Value of function
+addi $sp , $sp , 4
+move $sp , $s5
+jr $ra # Return Function
+addi $sp , $sp , 4 # UnAllocate Stack Area (Removing Block Statement Variables)
+addi $fp ,$sp , 4
+# End of Statement Block
+lw $v0, 0($sp)
+abs_mult_end:
+jr $ra
+
 main: # main function
 addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5
 # Function Body :
@@ -81,11 +257,11 @@ addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5
 addi $sp , $sp , -8 # Allocate From Stack For Block Statement Variables
 addi $fp , $sp , 4
 # Left Hand Side Assign
-# Loading Address of ID : a1
+# Loading Address of ID : a2
 li $s6 , 0
-addi $s6 , $s6 , 0
+addi $s6 , $s6 , 4
 add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 0 to Stack
+sw $s7, 0($sp) # Push Address of 4 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # Read Integer ( Decimal or Hexadecimal ) : 
@@ -109,11 +285,11 @@ addi $sp , $sp , 4
 # End of Expression Optional
 addi $sp , $sp 4
 # Left Hand Side Assign
-# Loading Address of ID : b1
+# Loading Address of ID : b2
 li $s6 , 0
-addi $s6 , $s6 , 4
+addi $s6 , $s6 , 8
 add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 4 to Stack
+sw $s7, 0($sp) # Push Address of 8 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # Read Integer ( Decimal or Hexadecimal ) : 
@@ -142,21 +318,21 @@ sw $fp , 4($sp)
 sw $ra , 8($sp)
 sw $s5 , 12($sp)
 # Function Arguments
-# Loading Address of ID : b1
+# Loading Address of ID : b2
 li $s6 , 0
-addi $s6 , $s6 , 4
+addi $s6 , $s6 , 8
 add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 4 to Stack
+sw $s7, 0($sp) # Push Address of 8 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
 lw $t0 , 0($t0)
 sw $t0 , 4($sp)
-# Loading Address of ID : a1
+# Loading Address of ID : a2
 li $s6 , 0
-addi $s6 , $s6 , 0
+addi $s6 , $s6 , 4
 add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 0 to Stack
+sw $s7, 0($sp) # Push Address of 4 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
@@ -186,190 +362,14 @@ lw $v0, 0($sp)
 main_end:
 jr $ra
 
-__abs_mult: # Start function
-addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5
-# Function Body :
-# Begin of Statement Block
-addi $sp , $sp , -4 # Allocate From Stack For Block Statement Variables
-addi $fp , $sp , 4
-# Loading Address of ID : a4
-li $s6 , 0
-addi $s6 , $s6 , 12
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 12 to Stack
-addi $sp, $sp, -4
-# loading address of lvalue
-lw $t0, 4($sp)
-lw $t0 , 0($t0)
-sw $t0 , 4($sp)
-# Loading Address of ID : b4
-li $s6 , 0
-addi $s6 , $s6 , 16
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 16 to Stack
-addi $sp, $sp, -4
-# loading address of lvalue
-lw $t0, 4($sp)
-lw $t0 , 0($t0)
-sw $t0 , 4($sp)
-# greater than Expression
-lw $t0 , 8($sp)
-lw $t1 , 4($sp)
-sgt $t0 , $t0 , $t1
-sw $t0 , 8($sp)
-addi $sp , $sp , 4
-addi $sp , $sp , 4
-lw $t0 , 0($sp)
-beq $t0 , $zero , label0
-# Left Hand Side Assign
-# Loading Address of ID : c3
-li $s6 , 0
-addi $s6 , $s6 , 8
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 8 to Stack
-addi $sp, $sp, -4
-# Right Hand Side Assign
-# Loading Address of ID : a4
-li $s6 , 0
-addi $s6 , $s6 , 12
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 12 to Stack
-addi $sp, $sp, -4
-# loading address of lvalue
-lw $t0, 4($sp)
-lw $t0 , 0($t0)
-sw $t0 , 4($sp)
-# Loading Address of ID : b4
-li $s6 , 0
-addi $s6 , $s6 , 16
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 16 to Stack
-addi $sp, $sp, -4
-# loading address of lvalue
-lw $t0, 4($sp)
-lw $t0 , 0($t0)
-sw $t0 , 4($sp)
-# minus Expression
-lw $t0 , 8($sp)
-lw $t1 , 4($sp)
-sub $t0 , $t0 , $t1
-sw $t0 , 8($sp)
-addi $sp , $sp , 4
-# Assign Right Side to Left
-lw $t0 , 8($sp)
-lw $t1 , 4($sp)
-sw $t1 , 0($t0)
-sw $t1 , 8($sp)
-addi $sp , $sp , 4
-# End of Expression Optional
-addi $sp , $sp 4
-j label1
-label0 :
-# Left Hand Side Assign
-# Loading Address of ID : c3
-li $s6 , 0
-addi $s6 , $s6 , 8
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 8 to Stack
-addi $sp, $sp, -4
-# Right Hand Side Assign
-# Loading Address of ID : b4
-li $s6 , 0
-addi $s6 , $s6 , 16
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 16 to Stack
-addi $sp, $sp, -4
-# loading address of lvalue
-lw $t0, 4($sp)
-lw $t0 , 0($t0)
-sw $t0 , 4($sp)
-# Loading Address of ID : a4
-li $s6 , 0
-addi $s6 , $s6 , 12
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 12 to Stack
-addi $sp, $sp, -4
-# loading address of lvalue
-lw $t0, 4($sp)
-lw $t0 , 0($t0)
-sw $t0 , 4($sp)
-# minus Expression
-lw $t0 , 8($sp)
-lw $t1 , 4($sp)
-sub $t0 , $t0 , $t1
-sw $t0 , 8($sp)
-addi $sp , $sp , 4
-# Assign Right Side to Left
-lw $t0 , 8($sp)
-lw $t1 , 4($sp)
-sw $t1 , 0($t0)
-sw $t1 , 8($sp)
-addi $sp , $sp , 4
-# End of Expression Optional
-addi $sp , $sp 4
-label1 :
-#End of if statement
-# Loading Address of ID : c3
-li $s6 , 0
-addi $s6 , $s6 , 8
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 8 to Stack
-addi $sp, $sp, -4
-# loading address of lvalue
-lw $t0, 4($sp)
-lw $t0 , 0($t0)
-sw $t0 , 4($sp)
-# Loading Address of ID : a4
-li $s6 , 0
-addi $s6 , $s6 , 12
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 12 to Stack
-addi $sp, $sp, -4
-# loading address of lvalue
-lw $t0, 4($sp)
-lw $t0 , 0($t0)
-sw $t0 , 4($sp)
-# Loading Address of ID : b4
-li $s6 , 0
-addi $s6 , $s6 , 16
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 16 to Stack
-addi $sp, $sp, -4
-# loading address of lvalue
-lw $t0, 4($sp)
-lw $t0 , 0($t0)
-sw $t0 , 4($sp)
-# div Expression
-lw $t0 , 8($sp)
-lw $t1 , 4($sp)
-mul $t0 , $t0 , $t1
-sw $t0 , 8($sp)
-addi $sp , $sp , 4
-# div Expression
-lw $t0 , 8($sp)
-lw $t1 , 4($sp)
-mul $t0 , $t0 , $t1
-sw $t0 , 8($sp)
-addi $sp , $sp , 4
-lw $v0 , 4($sp) # Loading Return Value of function
-addi $sp , $sp , 4
-move $sp , $s5
-jr $ra # Return Function
-addi $sp , $sp , 4 # UnAllocate Stack Area (Removing Block Statement Variables)
-addi $fp ,$sp , 4
-# End of Statement Block
-lw $v0, 0($sp)
-abs_mult_end:
-jr $ra
-
 
 
 .data
-a1 : .word 0
-b1 : .word 0
-c3 : .word 0
-a4 : .word 0
-b4 : .word 0
+c1 : .word 0
+a2 : .word 0
+b2 : .word 0
+a3 : .word 0
+b3 : .word 0
 str_false : .asciiz "false" 
 str_true : .asciiz "true" 
 new_line : .asciiz "
