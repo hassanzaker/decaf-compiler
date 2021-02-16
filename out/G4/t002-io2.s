@@ -82,10 +82,8 @@ addi $sp , $sp , -12 # Allocate From Stack For Block Statement Variables
 addi $fp , $sp , 4
 # Left Hand Side Assign
 # Loading Address of ID : b2
-li $s6 , 0
-addi $s6 , $s6 , 4
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 4 to Stack
+la $s6 , b2
+sw $s6, 0($sp) # Push Address of 4 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # Int Constant : 0
@@ -103,10 +101,8 @@ addi $sp , $sp 4
 # Initialization Expression of Loop for
 # Left Hand Side Assign
 # Loading Address of ID : i2
-li $s6 , 0
-addi $s6 , $s6 , 8
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 8 to Stack
+la $s6 , i2
+sw $s6, 0($sp) # Push Address of 8 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # Int Constant : 1
@@ -143,10 +139,8 @@ lw $a0 , 0($sp)
 li $v0 , 4
 syscall
 # Loading Address of ID : i2
-li $s6 , 0
-addi $s6 , $s6 , 8
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 8 to Stack
+la $s6 , i2
+sw $s6, 0($sp) # Push Address of 8 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
@@ -171,10 +165,8 @@ la $a0 , new_line
 syscall
 # Left Hand Side Assign
 # Loading Address of ID : a2
-li $s6 , 0
-addi $s6 , $s6 , 0
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 0 to Stack
+la $s6 , a2
+sw $s6, 0($sp) # Push Address of 0 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # Read Integer ( Decimal or Hexadecimal ) : 
@@ -198,10 +190,8 @@ addi $sp , $sp , 4
 # End of Expression Optional
 addi $sp , $sp 4
 # Loading Address of ID : a2
-li $s6 , 0
-addi $s6 , $s6 , 0
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 0 to Stack
+la $s6 , a2
+sw $s6, 0($sp) # Push Address of 0 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
@@ -228,27 +218,21 @@ label2 :
 #End of if statement
 # Left Hand Side Assign
 # Loading Address of ID : b2
-li $s6 , 0
-addi $s6 , $s6 , 4
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 4 to Stack
+la $s6 , b2
+sw $s6, 0($sp) # Push Address of 4 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # Loading Address of ID : b2
-li $s6 , 0
-addi $s6 , $s6 , 4
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 4 to Stack
+la $s6 , b2
+sw $s6, 0($sp) # Push Address of 4 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
 lw $t0 , 0($t0)
 sw $t0 , 4($sp)
 # Loading Address of ID : a2
-li $s6 , 0
-addi $s6 , $s6 , 0
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 0 to Stack
+la $s6 , a2
+sw $s6, 0($sp) # Push Address of 0 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
@@ -274,17 +258,13 @@ addi $fp ,$sp , 4
 # Step Expression of For loop 
 # Left Hand Side Assign
 # Loading Address of ID : i2
-li $s6 , 0
-addi $s6 , $s6 , 8
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 8 to Stack
+la $s6 , i2
+sw $s6, 0($sp) # Push Address of 8 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # Loading Address of ID : i2
-li $s6 , 0
-addi $s6 , $s6 , 8
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 8 to Stack
+la $s6 , i2
+sw $s6, 0($sp) # Push Address of 8 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
@@ -319,10 +299,8 @@ lw $a0 , 0($sp)
 li $v0 , 4
 syscall
 # Loading Address of ID : i2
-li $s6 , 0
-addi $s6 , $s6 , 8
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 8 to Stack
+la $s6 , i2
+sw $s6, 0($sp) # Push Address of 8 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
@@ -343,10 +321,8 @@ lw $a0 , 0($sp)
 li $v0 , 4
 syscall
 # Loading Address of ID : b2
-li $s6 , 0
-addi $s6 , $s6 , 4
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 4 to Stack
+la $s6 , b2
+sw $s6, 0($sp) # Push Address of 4 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)

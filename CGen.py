@@ -18,11 +18,7 @@ class Cgen(Transformer):
         self.stack = []
         self.last_class = 0
 
-    def write_code_in_file(self, code):
-        dirname = os.path.dirname(__file__)
-        file = open(dirname + "/result.s", "w")
-        file.write(code)
-        file.close()
+
 
     def aexp(self, args):
         return args[0]
@@ -121,7 +117,7 @@ class Cgen(Transformer):
     def exp_mul_exp(self, args):
         value_type1 = args[0]['value_type']
         value_type2 = args[1]['value_type']
-        code = "# div Expression\n"
+        code = "# mul Expression\n"
         if value_type1 == 'int' and value_type2 == value_type1:
             code += "lw $t0 , 8($sp)\n"
             code += "lw $t1 , 4($sp)\n"
@@ -554,11 +550,13 @@ class Cgen(Transformer):
     def lvalue_id(self, args):
         name = args[0].children[0].value
         var, address = self.symbol_table.getVariable(name, self.scope)
-        code = "# Loading Address of ID : " + var.name + str(var.scope) + "\n"
-        code += "li $s6 , 0\n"
-        code += "addi $s6 , $s6 , " + str(address) + "\n"
-        code += "add $s7 , $fp , $s6\n"
-        code += 'sw $s7, 0($sp)' + ' # Push Address of ' + str(address) + ' to Stack\n'
+        varName = var.name + str(var.scope)
+        code = "# Loading Address of ID : " + varName + "\n"
+        code += "la $s6 , " + varName + "\n"
+        # code += "li $s6 , 0\n"
+        # code += "addi $s6 , $s6 , " + str(address) + "\n"
+        # code += "add $s7 , $fp , $s6\n"
+        code += 'sw $s6, 0($sp)' + ' # Push Address of ' + str(address) + ' to Stack\n'
         code += 'addi $sp, $sp, -4\n'
         return {'code': code,
                 'name': var.name,
@@ -687,13 +685,15 @@ class Cgen(Transformer):
         func = self.symbol_table.getFunction(id)
         value_type = func.type
         actuals = args[1]
+        print(func.formals)
         if (len(actuals['actual_types']) != len(func.formals)):
             raise Exception('"function ' + str(id) + " has " + str(len(func.formals)) + " arguments!")
         size = len(func.formals)
         actual_types = actuals['actual_types']
         for i in range(size):
-            if actual_types[i] != func.formals[i]:
+            if actual_types[i] != func.formals[i]['type']:
                 raise Exception('type for calling function is not true!')
+
         code = "# Storing Frame Pointer and Return Address Before Calling the function : " + id + "\n"
         code += "addi $sp , $sp , -12\n"
         code += "sw $fp , 4($sp)\n"
@@ -701,6 +701,19 @@ class Cgen(Transformer):
         code += "sw $s5 , 12($sp)\n"
         code += "# Function Arguments\n"
         code += actuals['code']
+        counter = size * 4
+        for formal in func.formals:
+            name = str(formal['name']) + str(formal['scope'])
+            if formal['type'] == 'double':
+                code += "la $t1 , " + name + "\n"
+                code += "l.s $f0 , " + str(counter) + "($sp)\n"
+                code += "s.s $f0 , 0($t1)\n"
+            else:
+                code += "la $t1 , " + name + "\n"
+                code += "lw $t0 , " + str(counter) + "($sp)\n"
+                code += "sw $t0 , 0($t1)\n"
+            counter -= 4
+
         code += "jal __" + str(id) + " # Calling Function\n"
         code += "# Pop Arguments of function\n"
         code += "addi $sp , $sp , " + str(actuals['variable_count'] * 4) + "\n"
@@ -744,7 +757,7 @@ class Cgen(Transformer):
         size = len(func['formals'])
         actual_types = actuals['actual_types']
         for i in range(size):
-            if actual_types[i] != func['formals'][i]:
+            if actual_types[i] != func['formals'][i]['type']:
                 raise Exception('type for calling function is not true!')
         if not('this' in obj_expr):
             if flag and (func['access_level'] == "private"):
@@ -767,6 +780,18 @@ class Cgen(Transformer):
         code += "sw $s5 , 12($sp)\n"
         code += "# Method\'s Arguments \n"
         code += actuals['code']
+        counter = size * 4
+        for formal in func['formals']:
+            name = str(formal['name']) + str(formal['scope'])
+            if formal['type'] == 'double':
+                code += "la $t1 , " + name + "\n"
+                code += "l.s $f0 , " + str(counter) + "($sp)\n"
+                code += "s.s $f0 , 0($t1)\n"
+            else:
+                code += "la $t1 , " + name + "\n"
+                code += "lw $t0 , " + str(counter) + "($sp)\n"
+                code += "sw $t0 , 0($t1)\n"
+            counter -= 4
         code += "lw $t0 , " + str(actuals['variable_count'] * 4 + 12 + 4 + 4) + "($sp) # Loading Object being called\n"
         code += "sw $t0 , 0($sp) # Pushing object as \"this\" as first argument of method\n"
         code += "addi $s4 , $t0 , 0\n"
@@ -833,9 +858,10 @@ class Cgen(Transformer):
         if type != 'int':
             raise Exception('first argument should be int!')
         self.builtin_functions.append("itod")
-        code = "# itod \n"
+        code = args[0]['code']
+        code += "# itod \n"
         code += "addi $sp , $sp , -8\n"
-        code += "lw $t0 , 8($sp)\n"
+        code += "lw $t0 , 12($sp)\n"
         code += "sw $fp , 8($sp)\n"
         code += "sw $ra , 4($sp)\n"
         code += "jal itod # Calling itod Function \n"
@@ -850,9 +876,10 @@ class Cgen(Transformer):
         if type != 'double':
             raise Exception('first argument should be double!')
         self.builtin_functions.append("dtoi")
-        code = "# dtoi \n"
+        code = args[0]['code']
+        code += "# dtoi \n"
         code += "addi $sp , $sp , -8\n"
-        code += "l.s $f0 , 8($sp)\n"
+        code += "l.s $f0 , 12($sp)\n"
         code += "sw $fp , 8($sp)\n"
         code += "sw $ra , 4($sp)\n"
         code += "jal dtoi # Calling dtoi Function \n"
@@ -867,9 +894,10 @@ class Cgen(Transformer):
         if type != 'int':
             raise Exception('first argument should be int!')
         self.builtin_functions.append("itob")
-        code = "# itob \n"
+        code = args[0]['code']
+        code += "# itob \n"
         code += "addi $sp , $sp , -8\n"
-        code += "lw $t0 , 8($sp)\n"
+        code += "lw $t0 , 12($sp)\n"
         code += "sw $fp , 8($sp)\n"
         code += "sw $ra , 4($sp)\n"
         code += "jal itob # Calling itob Function \n"
@@ -884,9 +912,10 @@ class Cgen(Transformer):
         if type != 'bool':
             raise Exception('first argument should be bool!')
         self.builtin_functions.append("btoi")
-        code = "# btoi \n"
+        code = args[0]['code']
+        code += "# btoi \n"
         code += "addi $sp , $sp , -8\n"
-        code += "lw $t0 , 8($sp)\n"
+        code += "lw $t0 , 12($sp)\n"
         code += "sw $fp , 8($sp)\n"
         code += "sw $ra , 4($sp)\n"
         code += "jal btoi # Calling btoi Function \n"

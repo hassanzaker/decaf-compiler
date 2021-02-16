@@ -81,26 +81,22 @@ addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5
 addi $sp , $sp , -0 # Allocate From Stack For Block Statement Variables
 addi $fp , $sp , 4
 # Loading Address of ID : a2
-li $s6 , 0
-addi $s6 , $s6 , 0
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 0 to Stack
+la $s6 , a2
+sw $s6, 0($sp) # Push Address of 0 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
 lw $t0 , 0($t0)
 sw $t0 , 4($sp)
 # Loading Address of ID : b2
-li $s6 , 0
-addi $s6 , $s6 , 4
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 4 to Stack
+la $s6 , b2
+sw $s6, 0($sp) # Push Address of 4 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
 lw $t0 , 0($t0)
 sw $t0 , 4($sp)
-# div Expression
+# mul Expression
 lw $t0 , 8($sp)
 lw $t1 , 4($sp)
 mul $t0 , $t0 , $t1
@@ -125,10 +121,8 @@ addi $sp , $sp , -8 # Allocate From Stack For Block Statement Variables
 addi $fp , $sp , 4
 # Left Hand Side Assign
 # Loading Address of ID : a2
-li $s6 , 0
-addi $s6 , $s6 , 4
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 4 to Stack
+la $s6 , a2
+sw $s6, 0($sp) # Push Address of 4 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # Read Integer ( Decimal or Hexadecimal ) : 
@@ -153,10 +147,8 @@ addi $sp , $sp , 4
 addi $sp , $sp 4
 # Left Hand Side Assign
 # Loading Address of ID : b2
-li $s6 , 0
-addi $s6 , $s6 , 8
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 8 to Stack
+la $s6 , b2
+sw $s6, 0($sp) # Push Address of 8 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # Read Integer ( Decimal or Hexadecimal ) : 
@@ -186,25 +178,27 @@ sw $ra , 8($sp)
 sw $s5 , 12($sp)
 # Function Arguments
 # Loading Address of ID : b2
-li $s6 , 0
-addi $s6 , $s6 , 8
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 8 to Stack
+la $s6 , b2
+sw $s6, 0($sp) # Push Address of 8 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
 lw $t0 , 0($t0)
 sw $t0 , 4($sp)
 # Loading Address of ID : a2
-li $s6 , 0
-addi $s6 , $s6 , 4
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 4 to Stack
+la $s6 , a2
+sw $s6, 0($sp) # Push Address of 4 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
 lw $t0 , 0($t0)
 sw $t0 , 4($sp)
+la $t1 , b2
+lw $t0 , 8($sp)
+sw $t0 , 0($t1)
+la $t1 , a2
+lw $t0 , 4($sp)
+sw $t0 , 0($t1)
 jal __test # Calling Function
 # Pop Arguments of function
 addi $sp , $sp , 8

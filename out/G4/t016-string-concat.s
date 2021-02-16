@@ -38,10 +38,8 @@ addi $sp , $sp , -8 # Allocate From Stack For Block Statement Variables
 addi $fp , $sp , 4
 # Left Hand Side Assign
 # Loading Address of ID : a1
-li $s6 , 0
-addi $s6 , $s6 , 0
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 0 to Stack
+la $s6 , a1
+sw $s6, 0($sp) # Push Address of 0 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # String Constant : "hello "
@@ -58,10 +56,8 @@ addi $sp , $sp , 4
 addi $sp , $sp 4
 # Left Hand Side Assign
 # Loading Address of ID : b1
-li $s6 , 0
-addi $s6 , $s6 , 4
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 4 to Stack
+la $s6 , b1
+sw $s6, 0($sp) # Push Address of 4 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # String Constant : "world"
@@ -77,20 +73,16 @@ addi $sp , $sp , 4
 # End of Expression Optional
 addi $sp , $sp 4
 # Loading Address of ID : a1
-li $s6 , 0
-addi $s6 , $s6 , 0
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 0 to Stack
+la $s6 , a1
+sw $s6, 0($sp) # Push Address of 0 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
 lw $t0 , 0($t0)
 sw $t0 , 4($sp)
 # Loading Address of ID : b1
-li $s6 , 0
-addi $s6 , $s6 , 4
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 4 to Stack
+la $s6 , b1
+sw $s6, 0($sp) # Push Address of 4 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)

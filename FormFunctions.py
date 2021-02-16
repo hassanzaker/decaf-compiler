@@ -6,7 +6,7 @@ class FormFunctions(Transformer):
             name = args[0].children[1].children[0].value
             return {'type': 'func', 'all': Tree('decl_function_decl', [args[0]]), 'name': name}
         except:
-            return args
+            return Tree('decl_function_decl', args)
 
     def program(self, args):
         lst = []

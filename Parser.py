@@ -60,27 +60,27 @@ def create_parser():
         break_stmt : "break" ";" -> break_stmt
         continue_stmt : "continue" ";" -> continue_stmt
         print_stmt : "Print" "(" expr (","expr)* ")" ";" -> print_stmt
-        expr : l_value "=" expr -> expr_assign
+        expr : l_value "=" aexp -> expr_assign
             | aexp -> aexp
-        aexp: bexp "<" expr -> exp_less_exp 
-            | bexp "<=" expr -> exp_less_equal_exp
-            | bexp ">" expr -> exp_greater_exp
-            | bexp ">=" expr -> exp_greater_equal_exp
-            | bexp "==" expr -> exp_equal_exp
-            | bexp "!=" expr -> exp_not_equal_exp 
+        aexp: aexp "<" bexp -> exp_less_exp 
+            | aexp "<=" bexp -> exp_less_equal_exp
+            | aexp ">" bexp -> exp_greater_exp
+            | aexp ">=" bexp -> exp_greater_equal_exp
+            | aexp "==" bexp -> exp_equal_exp
+            | aexp "!=" bexp -> exp_not_equal_exp 
             | bexp -> bexp
-        bexp: cexp "&&" expr -> exp_and_exp
-            | cexp "||" expr -> exp_or_exp
-            | cexp "%" expr -> exp_mod_exp
+        bexp: bexp "&&" cexp -> exp_and_exp
+            | bexp "||" cexp -> exp_or_exp
+            | bexp "%" cexp -> exp_mod_exp
             | cexp -> cexp
-        cexp: dexp "+" expr -> exp_plus_exp
-            | dexp "-" expr -> exp_minus_exp
+        cexp: cexp "+" dexp -> exp_plus_exp
+            | cexp "-" dexp -> exp_minus_exp
             | dexp -> dexp
-        dexp: eexp "*" expr -> exp_mul_exp
-            | eexp "/" expr -> exp_div_exp
+        dexp: dexp "*" eexp -> exp_mul_exp
+            | dexp "/" eexp -> exp_div_exp
             | eexp -> eexp
-        eexp: "-" expr -> exp_negative           
-            | "!" expr -> exp_not
+        eexp: "-" eexp -> exp_negative           
+            | "!" eexp -> exp_not
             | fexp -> fexp
         fexp: constant -> expr_constant
             | l_value -> lvalue
@@ -122,7 +122,7 @@ def create_parser():
         %ignore WHITESPACE
         %ignore INLINE_COMMENT
         %ignore MULTILINE_COMMENT
-        """, start="program", parser="lalr", lexer="standard")
+        """, start="program", parser="earley", lexer="standard")
     return parser
 
 

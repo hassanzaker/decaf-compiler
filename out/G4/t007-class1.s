@@ -91,17 +91,13 @@ addi $sp , $sp , -0 # Allocate From Stack For Block Statement Variables
 addi $fp , $sp , 4
 # Left Hand Side Assign
 # Loading Address of ID : name7
-li $s6 , 4
-addi $s6 , $s6 , 12
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 12 to Stack
+la $s6 , name7
+sw $s6, 0($sp) # Push Address of 12 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # Loading Address of ID : new_name2
-li $s6 , 4
-addi $s6 , $s6 , 0
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 0 to Stack
+la $s6 , new_name2
+sw $s6, 0($sp) # Push Address of 0 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
@@ -129,17 +125,13 @@ addi $sp , $sp , -0 # Allocate From Stack For Block Statement Variables
 addi $fp , $sp , 4
 # Left Hand Side Assign
 # Loading Address of ID : age7
-li $s6 , 4
-addi $s6 , $s6 , 16
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 16 to Stack
+la $s6 , age7
+sw $s6, 0($sp) # Push Address of 16 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # Loading Address of ID : new_age4
-li $s6 , 4
-addi $s6 , $s6 , 4
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 4 to Stack
+la $s6 , new_age4
+sw $s6, 0($sp) # Push Address of 4 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
@@ -175,10 +167,8 @@ lw $a0 , 0($sp)
 li $v0 , 4
 syscall
 # Loading Address of ID : name7
-li $s6 , 4
-addi $s6 , $s6 , 12
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 12 to Stack
+la $s6 , name7
+sw $s6, 0($sp) # Push Address of 12 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
@@ -199,10 +189,8 @@ lw $a0 , 0($sp)
 li $v0 , 4
 syscall
 # Loading Address of ID : age7
-li $s6 , 4
-addi $s6 , $s6 , 16
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 16 to Stack
+la $s6 , age7
+sw $s6, 0($sp) # Push Address of 16 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
@@ -230,10 +218,8 @@ addi $sp , $sp , -12 # Allocate From Stack For Block Statement Variables
 addi $fp , $sp , 4
 # Left Hand Side Assign
 # Loading Address of ID : name7
-li $s6 , 0
-addi $s6 , $s6 , 12
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 12 to Stack
+la $s6 , name7
+sw $s6, 0($sp) # Push Address of 12 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # Read Line : 
@@ -255,10 +241,8 @@ addi $sp , $sp , 4
 addi $sp , $sp 4
 # Left Hand Side Assign
 # Loading Address of ID : age7
-li $s6 , 0
-addi $s6 , $s6 , 16
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 16 to Stack
+la $s6 , age7
+sw $s6, 0($sp) # Push Address of 16 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # Read Integer ( Decimal or Hexadecimal ) : 
@@ -283,10 +267,8 @@ addi $sp , $sp , 4
 addi $sp , $sp 4
 # Left Hand Side Assign
 # Loading Address of ID : p7
-li $s6 , 0
-addi $s6 , $s6 , 8
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 8 to Stack
+la $s6 , p7
+sw $s6, 0($sp) # Push Address of 8 to Stack
 addi $sp, $sp, -4
 # Right Hand Side Assign
 # new object of type : Person
@@ -306,10 +288,8 @@ addi $sp , $sp 4
 # Calling Method of Object
 # Object Expression
 # Loading Address of ID : p7
-li $s6 , 0
-addi $s6 , $s6 , 8
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 8 to Stack
+la $s6 , p7
+sw $s6, 0($sp) # Push Address of 8 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
@@ -328,15 +308,16 @@ sw $ra , 8($sp)
 sw $s5 , 12($sp)
 # Method's Arguments 
 # Loading Address of ID : name7
-li $s6 , 0
-addi $s6 , $s6 , 12
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 12 to Stack
+la $s6 , name7
+sw $s6, 0($sp) # Push Address of 12 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
 lw $t0 , 0($t0)
 sw $t0 , 4($sp)
+la $t1 , new_name2
+lw $t0 , 4($sp)
+sw $t0 , 0($t1)
 lw $t0 , 24($sp) # Loading Object being called
 sw $t0 , 0($sp) # Pushing object as "this" as first argument of method
 addi $s4 , $t0 , 0
@@ -355,10 +336,8 @@ addi $sp , $sp 4
 # Calling Method of Object
 # Object Expression
 # Loading Address of ID : p7
-li $s6 , 0
-addi $s6 , $s6 , 8
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 8 to Stack
+la $s6 , p7
+sw $s6, 0($sp) # Push Address of 8 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
@@ -377,15 +356,16 @@ sw $ra , 8($sp)
 sw $s5 , 12($sp)
 # Method's Arguments 
 # Loading Address of ID : age7
-li $s6 , 0
-addi $s6 , $s6 , 16
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 16 to Stack
+la $s6 , age7
+sw $s6, 0($sp) # Push Address of 16 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)
 lw $t0 , 0($t0)
 sw $t0 , 4($sp)
+la $t1 , new_age4
+lw $t0 , 4($sp)
+sw $t0 , 0($t1)
 lw $t0 , 24($sp) # Loading Object being called
 sw $t0 , 0($sp) # Pushing object as "this" as first argument of method
 addi $s4 , $t0 , 0
@@ -404,10 +384,8 @@ addi $sp , $sp 4
 # Calling Method of Object
 # Object Expression
 # Loading Address of ID : p7
-li $s6 , 0
-addi $s6 , $s6 , 8
-add $s7 , $fp , $s6
-sw $s7, 0($sp) # Push Address of 8 to Stack
+la $s6 , p7
+sw $s6, 0($sp) # Push Address of 8 to Stack
 addi $sp, $sp, -4
 # loading address of lvalue
 lw $t0, 4($sp)

@@ -114,7 +114,7 @@ class MyTransformer(Transformer):
         for arg in args[2]:
             if (not isinstance(arg, Tree)) and 'name' in arg and 'type' in arg:
                 self.symbol_table.addVariable(Symbol(self.scope, arg['name'], arg['type']))
-                formals.append(arg['type'])
+                formals.append({'name': arg['name'], 'type': arg['type'], 'scope': self.scope})
         self.symbol_table.addFunction(Function(self.scope, args[1].children[0].value, args[0], formals))
         return {'type': args[0], 'name': args[1].children[0].value, 'formals': formals}
 
@@ -125,7 +125,7 @@ class MyTransformer(Transformer):
         for arg in args[2]:
             if (not isinstance(arg, Tree)) and 'name' in arg and 'type' in arg:
                 self.symbol_table.addVariable(Symbol(self.scope, arg['name'], arg['type']))
-                formals.append(arg['type'])
+                formals.append({'name': arg['name'], 'type': arg['type'], 'scope': self.scope})
         self.symbol_table.addFunction(Function(self.scope, args[1].children[0].value, args[0], formals))
         return {'type': args[0].value, 'name': args[1].children[0].value, 'formals': formals}
 
@@ -135,7 +135,7 @@ class MyTransformer(Transformer):
         for arg in args[1]:
             if (not isinstance(arg, Tree)) and 'name' in arg and 'type' in arg:
                 self.symbol_table.addVariable(Symbol(self.scope, arg['name'], arg['type']))
-                formals.append(arg['type'])
+                formals.append({'name': arg['name'], 'type': arg['type'], 'scope': self.scope})
         self.symbol_table.addFunction(Function(self.scope, args[0].children[0].value, args[0], formals))
         return {'type': 'void', 'name': args[0].children[0].value, 'formals': formals}
 

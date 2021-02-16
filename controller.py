@@ -21,9 +21,9 @@ errorMsg: .asciiz "Semantic Error"
 text = """
 class Ali{
  int x;
- void f(int e, int f){
+ void f(int e){
   Print(this.x);
-  Print(e , f);
+  Print(e);
  }
  void g(int g){
   Print(this.x);
@@ -55,10 +55,10 @@ class Hassan{
 int main() {
     Ali a;
     Hassan b;
-    a = New Ali;
-    b = New Hassan;
+    a = new Ali;
+    b = new Hassan;
     a.x = 7;
-    a.f(33, 2);
+    a.f(33);
     a.g(44);
     a.h(55);
     b.x = 13;
@@ -83,14 +83,31 @@ def start(data):
 
 
 # text = """
-# int dsaa() {
-#     string name;
-# }
-#
 # int main() {
+#     int a;
+#     int b;
+#     int c;
+#     int d;
 #
+#     int z;
+#
+#     a = 5;
+#     b = -6;
+#     c = 100;
+#     d = 33;
+#
+#     z = a + b * c - d / a;
+#
+#     Print(z);
 # }
 # """
+#
+# def write_code_in_file(code):
+#     dirname = os.path.dirname(__file__)
+#     file = open(dirname + "/result.s", "w")
+#     file.write(code)
+#     file.close()
+#
 #
 # tree = parse_text(text)
 # print(tree)
@@ -102,4 +119,6 @@ def start(data):
 #
 # a.transform(tree)
 # b = Cgen(a.classes, a.symbol_table).transform(tree)
-# print(b)
+# write_code_in_file(b)
+#
+#
