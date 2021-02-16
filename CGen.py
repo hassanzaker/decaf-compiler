@@ -685,13 +685,18 @@ class Cgen(Transformer):
         func = self.symbol_table.getFunction(id)
         value_type = func.type
         actuals = args[1]
-        print(func.formals)
         if (len(actuals['actual_types']) != len(func.formals)):
             raise Exception('"function ' + str(id) + " has " + str(len(func.formals)) + " arguments!")
         size = len(func.formals)
         actual_types = actuals['actual_types']
         for i in range(size):
-            if actual_types[i] != func.formals[i]['type']:
+            if self.isPrimitiveType(actual_types[i]) and self.isPrimitiveType(func.formals[i]['type']):
+                if actual_types[i] != func.formals[i]['type']:
+                    raise Exception('type for calling function is not true!')
+            elif (not self.isPrimitiveType(actual_types[i])) and (not self.isPrimitiveType(func.formals[i]['type'])):
+                if not self.classes.isConvertable(actual_types[i], func.formals[i]['type']):
+                    raise Exception('type for calling function is not true!')
+            else:
                 raise Exception('type for calling function is not true!')
 
         code = "# Storing Frame Pointer and Return Address Before Calling the function : " + id + "\n"
@@ -757,7 +762,13 @@ class Cgen(Transformer):
         size = len(func['formals'])
         actual_types = actuals['actual_types']
         for i in range(size):
-            if actual_types[i] != func['formals'][i]['type']:
+            if self.isPrimitiveType(actual_types[i]) and self.isPrimitiveType(func.formals[i]['type']):
+                if actual_types[i] != func.formals[i]['type']:
+                    raise Exception('type for calling function is not true!')
+            elif (not self.isPrimitiveType(actual_types[i])) and (not self.isPrimitiveType(func.formals[i]['type'])):
+                if not self.classes.isConvertable(actual_types[i], func.formals[i]['type']):
+                    raise Exception('type for calling function is not true!')
+            else:
                 raise Exception('type for calling function is not true!')
         if not('this' in obj_expr):
             if flag and (func['access_level'] == "private"):
@@ -953,9 +964,6 @@ class Cgen(Transformer):
             variable_count * 4) + " # UnAllocate Stack Area (Removing Block Statement Variables)\n"
         code += "addi $fp ,$sp , 4\n"
         code += "# End of Statement Block\n"
-        # print(self.symbol_table.variables)
-        # self.symbol_table.removeFromScop(self.scope)
-        # print(self.symbol_table.variables)
         return_types = list(set(return_types))
         return {'code': code, 'break_labels': break_labels, 'continue_labels': continue_labels,
                 'return_type': return_types}
@@ -1380,3 +1388,6 @@ class Cgen(Transformer):
         self.data_code += "obj_null : .word 61235\n"
         self.data_code += "__result: .space 200\n"
         return code + "\n\n.data\n" + self.data_code
+
+    def isPrimitiveType(self, type):
+        return type in ['int', 'double', 'string', 'bool']

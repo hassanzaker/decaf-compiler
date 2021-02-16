@@ -83,22 +83,12 @@ def start(data):
 
 
 # text = """
+# class A{}
+# class B extends A{}
+# class C extends B{}
+# void f(int i, A a, B b, C c){}
 # int main() {
-#     int a;
-#     int b;
-#     int c;
-#     int d;
-#
-#     int z;
-#
-#     a = 5;
-#     b = -6;
-#     c = 100;
-#     d = 33;
-#
-#     z = a + b * c - d / a;
-#
-#     Print(z);
+#     f(4, new C, new A, new C);
 # }
 # """
 #
@@ -120,5 +110,5 @@ def start(data):
 # a.transform(tree)
 # b = Cgen(a.classes, a.symbol_table).transform(tree)
 # write_code_in_file(b)
-#
-#
+
+

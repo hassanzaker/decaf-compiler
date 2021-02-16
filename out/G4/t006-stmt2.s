@@ -1,37 +1,5 @@
 .text
 .globl main
-ReadLine:
-        li $t0 , 0
-        li $t1 , 10 # '\n'
-        loopReadLine:
-            li $v0 , 12
-            syscall
-            addi $t0 , $t0 , 1
-            addi $sp , $sp , -1
-            beq $v0 , $t1 , endLoopReadLine
-            sb $v0 , 1($sp)
-            j loopReadLine
-            endLoopReadLine:
-            sb $zero , 1($sp)
-        # Allocating Space in Heap
-        li $v0 , 9
-        addi $a0 , $t0 , 0
-        syscall
-        move $t1 , $v0 # $t1 Holds the address of String in Heap
-        # Moving String from stack to Heap
-        addi $t0 , $t0 , -1 # $t0 is the offset of char in Heap ( from the end of allocated area )
-        loopMoveString:
-            add $t2 , $t1 , $t0 # $t2 is Char address in Heap
-            lb $t3 , 1($sp)
-            sb $t3 , 0($t2)
-            beq $t0 , $zero , endLoopMoveString
-            addi $sp , $sp , 1
-            addi $t0 , $t0 , -1
-            j loopMoveString
-        endLoopMoveString:
-        addi $sp , $sp , 1
-        # Here $v0 Contains the string address allocated in Heap
-        jr $ra
 readInteger:
     li $t3 , 10
     li $t1 , 0
@@ -73,6 +41,38 @@ readInteger:
     li $v0, 0
     jr $ra
 
+ReadLine:
+        li $t0 , 0
+        li $t1 , 10 # '\n'
+        loopReadLine:
+            li $v0 , 12
+            syscall
+            addi $t0 , $t0 , 1
+            addi $sp , $sp , -1
+            beq $v0 , $t1 , endLoopReadLine
+            sb $v0 , 1($sp)
+            j loopReadLine
+            endLoopReadLine:
+            sb $zero , 1($sp)
+        # Allocating Space in Heap
+        li $v0 , 9
+        addi $a0 , $t0 , 0
+        syscall
+        move $t1 , $v0 # $t1 Holds the address of String in Heap
+        # Moving String from stack to Heap
+        addi $t0 , $t0 , -1 # $t0 is the offset of char in Heap ( from the end of allocated area )
+        loopMoveString:
+            add $t2 , $t1 , $t0 # $t2 is Char address in Heap
+            lb $t3 , 1($sp)
+            sb $t3 , 0($t2)
+            beq $t0 , $zero , endLoopMoveString
+            addi $sp , $sp , 1
+            addi $t0 , $t0 , -1
+            j loopMoveString
+        endLoopMoveString:
+        addi $sp , $sp , 1
+        # Here $v0 Contains the string address allocated in Heap
+        jr $ra
 
 __abs_mult: # Start function
 addi $s5 , $sp , 0 # Storing $sp of function at beginning in $s5

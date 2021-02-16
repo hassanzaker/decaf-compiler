@@ -173,19 +173,25 @@ class Classes:
         return code
 
     def isChildOf(self, child, father):
-        if child.father != None:
+        while child.father != None:
             if child.father.name == father.name:
                 return True
-            else:
-                self.isChildOf(child.father, father)
-        else:
-            return False
+            child = child.father
+        return False
+
+    def getClassByType(self, type):
+        for cls in self.classes:
+            if cls.name == type:
+                return cls
+        raise Exception('class does not exist!')
 
     def isConvertable(self, first, second):
-        if first.name == second.name:
+        child = self.getClassByType(first)
+        father = self.getClassByType(second)
+        if child.name == father.name:
             return True
         else:
-            return self.isChildOf(first, second)
+            return self.isChildOf(child, father)
 
     def getConstructor(self):
         code = ''
